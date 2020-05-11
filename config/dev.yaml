@@ -1,0 +1,22 @@
+app:
+  logFile: log/gin.log
+  httpPort: 8080
+  webSocketPort: 8089
+  rpcPort: 9001
+  httpUrl: localhost:8080
+  webSocketUrl:  localhost:8089
+
+
+
+mongo:
+  addr: "47.115.191.231:27017"
+  username: root
+  password: 123
+  db: admin
+
+redis:
+  addr: "47.115.191.231:6379"
+  password: "123"
+  DB: 0
+  poolSize: 30
+  minIdleConns: 30
