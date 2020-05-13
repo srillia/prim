@@ -288,7 +288,7 @@
         function msg(name, msg) {
             let html = '<div class="admin-group">' +
                 '<div class="admin-img" >' + name + '</div>' +
-                // '<img class="admin-img" src="http://localhost/public/img/aa.jpg" />'+
+                // '<img class="admin-img" src="http://192.168.10.222/public/img/aa.jpg" />'+
                 '<div class="admin-msg">' +
                 '<i class="triangle-admin"></i>' +
                 '<span class="admin-reply">' + msg + '</span>' +
@@ -304,7 +304,7 @@
                 '<i class="triangle-user"></i>' +
                 '</div>' +
                 '<div class="user-img" >' + name + '</div>' +
-                // '<img class="user-img" src="http://localhost/public/img/cc.jpg" />'+
+                // '<img class="user-img" src="http://192.168.10.222/public/img/cc.jpg" />'+
                 '</div>';
             return html
         }
@@ -336,7 +336,7 @@
 
 
         // 连接webSocket
-        ws = new WebSocket("ws://localhost:8089/acc");
+        ws = new WebSocket("ws://192.168.10.222:8089/acc");
 
         ws.onopen = function(evt) {
             console.log("Connection open ...");
@@ -408,7 +408,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: 'http://localhost:8090/user/sendMessageAll',
+                    url: 'http://192.168.10.222:8090/user/sendMessageAll',
                     data: {
                         appId: "101",
                         userId: person,
@@ -430,7 +430,7 @@
         function getUserList() {
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8090/user/list",
+                url: "http://192.168.10.222:8090/user/list",
                 dataType: "json",
                 success: function(data) {
                     console.log("user list:" + data.code + "userList:" + data.data.userList);
