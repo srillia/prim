@@ -1,9 +1,9 @@
 app:
   logFile: log/gin.log
-  httpPort: 8090
+  httpPort: 8093
   webSocketPort: 8089
   rpcPort: 9001
-  httpUrl: localhost:8090
+  httpUrl: localhost:8093
   webSocketUrl:  localhost:8089
 
 
