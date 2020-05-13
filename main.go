@@ -69,7 +69,7 @@ func initConfig() {
 
 	switch runEnv {
 	case "local":
-		viper.SetConfigName("config/app")
+		viper.SetConfigName("config/local")
 	case "dev":
 		viper.SetConfigName("config/dev")
 	case "test":
@@ -79,7 +79,7 @@ func initConfig() {
 	case "prod":
 		viper.SetConfigName("config/prod")
 	default:
-		viper.SetConfigName("config/app")
+		viper.SetConfigName("config/local")
 	}
 	viper.AddConfigPath(".") // 添加搜索路径
 
