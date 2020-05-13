@@ -435,7 +435,8 @@ func ClearTimeoutConnections() {
 - js 建立连接，并处理连接成功、收到数据、断开连接的事件处理
 
 ```
-ws = new WebSocket("ws://127.0.0.1:8089/acc");
+ws = new WebSocket("ws://
+127.0.0.1:8089/acc");
 
  
 ws.onopen = function(evt) {
