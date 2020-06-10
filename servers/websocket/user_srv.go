@@ -84,7 +84,7 @@ func checkUserOnline(appId uint32, userId string) (online bool, err error) {
 }
 
 // 给全体用户发消息
-func SendMessageToReceivers(msg * models.Msg) (sendResults bool, err error) {
+func SendMessageToReceivers(msg *models.Msg) (sendResults bool, err error) {
 	sendResults = true
 
 	currentTime := uint64(time.Now().Unix())
@@ -100,7 +100,7 @@ func SendMessageToReceivers(msg * models.Msg) (sendResults bool, err error) {
 			SendMessagesLocally(msg)
 		} else {
 			//grpcclient.SendMsgAll(server, msgId, appId, userId, cmd, message)
-			//todo: 处理非本地服务器的消息发送
+			//todo: 处理非本地服务器的消息发送,集群使用的时候需要做RPC处理
 		}
 	}
 
@@ -112,14 +112,15 @@ func SendMessagesLocally(msg *models.Msg) {
 
 	receiverIds := msg.ReceiverIds
 
-	for _ ,receiId := range receiverIds {
+	for _, receiId := range receiverIds {
 		userKey := GetUserKey(msg.AppId, receiId)
 		if value, ok := clientManager.Users[userKey]; ok {
 			client := value
-			message,_ := json.Marshal(msg);
+			message, _ := json.Marshal(msg)
 			client.SendMsg(message)
-		} else  {
+		} else {
 			// todo: 如果对方不在线，将离线数据存到mongo中,临时保存
+
 		}
 	}
 }
@@ -138,17 +139,16 @@ func SendUserMessage(appId uint32, userId string, msgId, message string) (sendRe
 	return
 }
 
-
 // 给本机用户发送消息
 func SendUserMessageLocal(appId uint32, userId string, data string) (sendResults bool, err error) {
 
 	client := GetUserClient(appId, userId)
 	if client == nil {
 		err = errors.New("用户不在线")
-
+		//TODO 用户不在线存进MongoDB数据库
 		return
 	}
-
+	fmt.Println("给对应的用户发送信息")
 	// 发送消息
 	client.SendMsg([]byte(data))
 	sendResults = true

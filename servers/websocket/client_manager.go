@@ -177,7 +177,7 @@ func (manager *ClientManager) GetUserKeys() (userKeys []string) {
 	return
 }
 
-// 获取用户的key
+// 获取用户列表
 func (manager *ClientManager) GetUserList() (userList []string) {
 
 	userList = make([]string, 0)
@@ -195,7 +195,7 @@ func (manager *ClientManager) GetUserList() (userList []string) {
 	return
 }
 
-// 获取用户的key
+// 获取用户的客户端
 func (manager *ClientManager) GetUserClients() (clients []*Client) {
 
 	clients = make([]*Client, 0)
@@ -333,6 +333,7 @@ func GetManagerInfo(isDebug string) (managerInfo map[string]interface{}) {
 	return
 }
 
+//TODO 获取在线用户的信息
 // 获取用户所在的连接
 func GetUserClient(appId uint32, userId string) (client *Client) {
 	client = clientManager.GetUserClient(appId, userId)

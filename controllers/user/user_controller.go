@@ -60,8 +60,10 @@ func SendMessage(c *gin.Context) {
 	msgId := c.PostForm("msgId")
 	message := c.PostForm("message")
 
+	//拿到请求中的token
+	token := c.Request.Header.Get("authorization")
+	fmt.Print(token)
 	fmt.Println("http_request 给用户发送消息", appIdStr, userId, msgId, message)
-
 	appId, _ := strconv.ParseInt(appIdStr, 10, 32)
 
 	// TODO::进行用户权限认证，一般是客户端传入TOKEN，然后检验TOKEN是否合法，通过TOKEN解析出来用户ID
@@ -116,4 +118,16 @@ func SendMessageAll(c *gin.Context) {
 
 	controllers.Response(c, common.OK, "", data)
 
+}
+
+func SendMessageTest(c *gin.Context) {
+	fmt.Println("进入测试方法", c)
+	token := c.Request.Header.Get("authorization")
+	fmt.Println("获取的token为：", token)
+	val, flag := c.GetPostForm("token")
+	if flag {
+		fmt.Println("获取的值:", val)
+	}
+
+	controllers.Response(c, common.OK, val, nil)
 }

@@ -26,6 +26,7 @@ func Init(router *gin.Engine) {
 		userRouter.GET("/online", user.Online)
 		userRouter.POST("/sendMessage", user.SendMessage)
 		userRouter.POST("/sendMessageAll", user.SendMessageAll)
+		userRouter.GET("/sendMessageTest", user.SendMessageTest)
 	}
 
 	// 系统

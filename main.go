@@ -40,11 +40,11 @@ func main() {
 
 	// 服务注册
 	task.ServerInit()
-
+	//go 关键字类似创建一个新的线程去执行其他内容，并行处理
 	go websocket.StartWebSocket()
 	// grpc
 	go grpcserver.Init()
-
+	//这个初始化之后，可以不调用
 	go open()
 
 	httpPort := viper.GetString("app.httpPort")

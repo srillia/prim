@@ -58,7 +58,8 @@ func GetUserOnlineInfo(userKey string) (userOnline *models.UserOnline, err error
 	return
 }
 
-// 设置用户在线数据
+//TODO 往redis中存用户的数据
+//设置用户在线数据
 func SetUserOnlineInfo(userKey string, userOnline *models.UserOnline) (err error) {
 
 	redisClient := redislib.GetClient()

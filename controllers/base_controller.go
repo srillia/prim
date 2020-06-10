@@ -9,8 +9,8 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"prim/common"
 	"net/http"
+	"prim/common"
 )
 
 type BaseController struct {

@@ -28,9 +28,8 @@ func PingController(client *Client, seq string, message []byte) (code uint32, ms
 	return
 }
 
-
 // 给用户发送消息
-func MsgController(client *Client, seq string, message []byte) (code uint32, msg string, data interface{}){
+func MsgController(client *Client, seq string, message []byte) (code uint32, msg string, data interface{}) {
 	code = common.OK
 
 	request := &models.Msg{}
@@ -41,7 +40,7 @@ func MsgController(client *Client, seq string, message []byte) (code uint32, msg
 		return
 	}
 
-	fmt.Println("给用户发送消息:", request.AppId,request.SenderId, request.ReceiverIds,request.Message)
+	fmt.Println("给用户发送消息:", request.AppId, request.SenderId, request.ReceiverIds, request.Message)
 
 	SendMessageToReceivers(request)
 	return
@@ -49,7 +48,6 @@ func MsgController(client *Client, seq string, message []byte) (code uint32, msg
 
 // 用户登录
 func LoginController(client *Client, seq string, message []byte) (code uint32, msg string, data interface{}) {
-
 	code = common.OK
 	currentTime := uint64(time.Now().Unix())
 
@@ -62,7 +60,7 @@ func LoginController(client *Client, seq string, message []byte) (code uint32, m
 	}
 
 	fmt.Println("webSocket_request 用户登录", seq, "ServiceToken", request.ServiceToken)
-
+	// TODO 用户登录需要区分是否是客服。
 	// TODO::进行用户权限认证，一般是客户端传入TOKEN，然后检验TOKEN是否合法，通过TOKEN解析出来用户ID
 	// 本项目只是演示，所以直接过去客户端传入的用户ID
 	if request.UserId == "" || len(request.UserId) >= 20 {

@@ -93,6 +93,7 @@ func (c *Client) read() {
 
 // 向客户端写数据
 func (c *Client) write() {
+	fmt.Println("向客户端写数据")
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("write stop", string(debug.Stack()), r)
