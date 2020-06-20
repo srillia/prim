@@ -11,9 +11,10 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
-	"prim/helper"
-	"prim/models"
 	"net/http"
+	"prim/helper"
+	"prim/lib/redislib"
+	"prim/models"
 	"time"
 )
 
@@ -77,6 +78,13 @@ func StartWebSocket() {
 }
 
 func wsPage(w http.ResponseWriter, req *http.Request) {
+	sysAccount := req.URL.Query().Get("sysAccount")
+	userId := req.URL.Query().Get("userId")
+
+	if redislib.CheckTempKey(sysAccount, userId) {
+		//todo 写回w,无权建立连接
+		return
+	}
 
 	// 升级协议
 	conn, err := (&websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {

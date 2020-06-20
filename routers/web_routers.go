@@ -10,6 +10,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"prim/controllers/home"
+	"prim/controllers/sysclient"
 	"prim/controllers/systems"
 	"prim/controllers/user"
 )
@@ -27,6 +28,14 @@ func Init(router *gin.Engine) {
 		userRouter.POST("/sendMessage", user.SendMessage)
 		userRouter.POST("/sendMessageAll", user.SendMessageAll)
 		userRouter.GET("/sendMessageTest", user.SendMessageTest)
+	}
+
+	// 用户组
+	sysclientRouter := router.Group("/sysclient")
+	{
+		sysclientRouter.POST("/createSysclient", sysclient.CreateSysclientByPhoneNum)
+		sysclientRouter.GET("/getSysclient", sysclient.GetSysclientByAccount)
+		sysclientRouter.GET("/getTempKey", sysclient.GetTempUserKeyBySysclientAuthCode)
 	}
 
 	// 系统

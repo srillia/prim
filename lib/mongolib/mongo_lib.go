@@ -47,6 +47,11 @@ func InsertOne(coll *mongo.Collection, m interface{}) (interface{}, error) {
 	return id, err
 }
 
+func GetContext() context.Context {
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	return ctx
+}
+
 func InsertOneData(coll *mongo.Collection, m bson.M) (interface{}, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	res, err := coll.InsertOne(ctx, m)

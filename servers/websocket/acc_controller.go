@@ -40,6 +40,10 @@ func MsgController(client *Client, seq string, message []byte) (code uint32, msg
 		return
 	}
 
+	//todo 把信息存储到mongodb
+
+	//mongolib.GetConn("prim_room").
+
 	fmt.Println("给用户发送消息:", request.AppId, request.SenderId, request.ReceiverIds, request.Message)
 
 	SendMessageToReceivers(request)

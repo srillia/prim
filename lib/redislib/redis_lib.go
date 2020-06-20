@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
+	"prim/common"
 )
 
 var (
@@ -35,4 +36,28 @@ func ExampleNewClient() {
 func GetClient() (c *redis.Client) {
 
 	return client
+}
+
+func SaveTempKey(sysAccount string, userId string, tempKey string) {
+	//hash key 是由 sysAccount加用户id组成
+	hkey := sysAccount + ":tempKey"
+
+	number, err := client.Do("hSet", hkey, userId, tempKey).Int()
+	if err != nil {
+		fmt.Println("saveTempKeyInRedis", hkey, number, err)
+		return
+	}
+}
+
+func CheckTempKey(sysAccount string, userId string) bool {
+	//hash key 是由 sysAccount加用户id组成
+	hkey := sysAccount + ":tempKey"
+	requestTempKey := common.GenerateTempKey(sysAccount, userId)
+	tempKey, err := client.Do("hGet", hkey, userId).String()
+	if err != nil {
+		if requestTempKey == tempKey {
+			return true
+		}
+	}
+	return false
 }

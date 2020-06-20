@@ -7,10 +7,11 @@ import (
 
 type PrimSysClient struct {
 	Id       primitive.ObjectID `bson:"_id,omitempty"`
-	Account  string             `bson:"account,omitempty"`
-	Password string             `bson:"password,omitempty"`
-	State    byte               `bson:"state,omitempty"`
-	authCode string
+	PhoneNum string
+	Account  string `bson:"account,omitempty"`
+	Password string `bson:"password,omitempty"`
+	State    byte   `bson:"state,omitempty"`
+	AuthCode string
 }
 
 type PrimUser struct {
@@ -32,7 +33,7 @@ type PrimUser struct {
 
 type PrimRoom struct {
 	Id       primitive.ObjectID `bson:"_id,omitempty"`
-	UserList []string
+	UserList [2]string
 }
 
 type PrimMessage struct {
