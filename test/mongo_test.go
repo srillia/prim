@@ -29,10 +29,10 @@ func TestExist(t *testing.T) {
 
 	t.Log("hello world")
 	id, _ := primitive.ObjectIDFromHex("5ee9b032003953889c5cf6dd")
-	sysclient := &models.PrimSysClient{}
-	fmt.Printf("%v\n", sysclient)
+	sysClient := &models.PrimSysClient{}
+	fmt.Printf("%v\n", sysClient)
 	SingleResult := mongolib.GetConn("prim_message").FindOne(mongolib.GetContext(), bson.D{{"_id", id}})
-	err := SingleResult.Decode(sysclient)
+	err := SingleResult.Decode(sysClient)
 
 	//err为nil说明存在记录
 	if err == nil {

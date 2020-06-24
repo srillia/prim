@@ -10,7 +10,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"prim/controllers/home"
-	"prim/controllers/sysclient"
+	"prim/controllers/sysClient"
 	"prim/controllers/systems"
 	"prim/controllers/user"
 )
@@ -31,11 +31,11 @@ func Init(router *gin.Engine) {
 	}
 
 	// 用户组
-	sysclientRouter := router.Group("/sysclient")
+	sysClientRouter := router.Group("/sysClient")
 	{
-		sysclientRouter.POST("/createSysclient", sysclient.CreateSysclient)
-		sysclientRouter.GET("/getSysclient", sysclient.GetSysclientByAccount)
-		sysclientRouter.GET("/getTempKey", sysclient.GetTempUserKeyBySysclientAuthCode)
+		sysClientRouter.POST("/createSysClient", sysClient.CreateSysClient)
+		sysClientRouter.GET("/getSysClient", sysClient.GetSysClient)
+		sysClientRouter.GET("/getToken", sysClient.GetToken)
 	}
 
 	// 系统

@@ -1,4 +1,4 @@
-package sysclient
+package sysClient
 
 import (
 	"errors"
@@ -15,31 +15,31 @@ import (
 //todo 做系统用户的登录和授权
 
 //根据第三方系统用户账户，获取系统客户端
-func GetSysclientByAccount(c *gin.Context) {
+func GetSysClient(c *gin.Context) {
 	account := c.Query("account")
 	data := make(map[string]interface{})
-	sysclient, err := getSysclient(account)
+	sysClient, err := getSysClient(account)
 	if err != nil {
 		controllers.Response(c, common.NotData, "", data)
 		return
 	}
-	data["sysclient"] = sysclient
+	data["sysClient"] = sysClient
 	controllers.Response(c, common.OK, "", data)
 }
 
-func getSysclient(account string) (interface{}, error) {
-	sysclient, err := mongolib.FindOne(mongolib.GetConn("prim_sysclient"), bson.M{"account": account}, models.PrimSysClient{})
-	return sysclient, err
+func getSysClient(account string) (interface{}, error) {
+	sysClient, err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"), bson.M{"account": account}, models.PrimSysClient{})
+	return sysClient, err
 }
 
 // 查看全部在线用户
-func CreateSysclient(c *gin.Context) {
+func CreateSysClient(c *gin.Context) {
 	phoneNum := c.PostForm("phoneNum")
 	account := c.PostForm("account")
 	password := c.PostForm("password")
 	data := make(map[string]interface{})
 
-	err := saveSysclient(phoneNum, account, password)
+	err := saveSysClient(phoneNum, account, password)
 	if err == nil {
 		controllers.Response(c, common.OK, "", data)
 	} else {
@@ -48,10 +48,10 @@ func CreateSysclient(c *gin.Context) {
 
 }
 
-func saveSysclient(phoneNum string, account string, password string) error {
+func saveSysClient(phoneNum string, account string, password string) error {
 
 	//{"$or":[{"a":1}, {"b":2}]}
-	client, err := mongolib.FindOne(mongolib.GetConn("prim_sysclient"),
+	client, err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"),
 		bson.D{{"account", account}}, models.PrimSysClient{})
 	fmt.Printf("%v", client)
 
@@ -63,20 +63,20 @@ func saveSysclient(phoneNum string, account string, password string) error {
 
 	//Md5加密
 	md5Password := common.EncryptByMd5(password)
-	sysclient := models.PrimSysClient{}
-	sysclient.Account = account
-	sysclient.Password = md5Password
-	sysclient.PhoneNum = phoneNum
-	sysclient.State = 1
+	sysClient := models.PrimSysClient{}
+	sysClient.Account = account
+	sysClient.Password = md5Password
+	sysClient.PhoneNum = phoneNum
+	sysClient.State = 1
 	//生成AuthCode
-	sysclient.AuthCode = common.GenerateAuthCode(account)
+	sysClient.AuthCode = common.GenerateAuthCode(account)
 
-	mongolib.InsertOne(mongolib.GetConn("prim_sysclient"), sysclient)
+	mongolib.InsertOne(mongolib.GetConn("prim_sys_client"), sysClient)
 	return nil
 }
 
 //获取临时用户key，临时用户key，是用来，标记第三方系统的用户具有连接prim的权限的身份
-func GetTempUserKeyBySysclientAuthCode(c *gin.Context) {
+func GetToken(c *gin.Context) {
 	sysAccount := c.Query("sysAccount")
 	appPlatform := c.Query("appPlatform")
 	authCode := c.Query("authCode")
@@ -94,7 +94,7 @@ func GetTempUserKeyBySysclientAuthCode(c *gin.Context) {
 }
 
 func checkAuthCode(account string, code string) bool {
-	_, err := mongolib.FindOne(mongolib.GetConn("prim_sysclient"), bson.D{{"account", account}, {"authCode", code}}, models.PrimSysClient{})
+	_, err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"), bson.D{{"account", account}, {"authCode", code}}, models.PrimSysClient{})
 	//err == nil 说明存在
 	if err == nil {
 		return true
