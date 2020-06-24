@@ -13,12 +13,12 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
+	"log"
+	"net"
 	"prim/common"
 	"prim/models"
 	"prim/protobuf"
 	"prim/servers/websocket"
-	"log"
-	"net"
 )
 
 type server struct {
@@ -53,7 +53,7 @@ func (s *server) QueryUsersOnline(c context.Context, req *protobuf.QueryUsersOnl
 
 	rsp = &protobuf.QueryUsersOnlineRsp{}
 
-	online := websocket.CheckUserOnline(req.GetAppId(), req.GetUserId())
+	online := websocket.CheckUserOnline(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId())
 
 	setErr(req, common.OK, "")
 	rsp.Online = online
@@ -77,7 +77,7 @@ func (s *server) SendMsg(c context.Context, req *protobuf.SendMsgReq) (rsp *prot
 	}
 
 	data := models.GetMsgData(req.GetUserId(), req.GetSeq(), req.GetCms(), req.GetMsg())
-	sendResults, err := websocket.SendUserMessageLocal(req.GetAppId(), req.GetUserId(), data)
+	sendResults, err := websocket.SendUserMessageLocal(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId(), data)
 	if err != nil {
 		fmt.Println("系统错误", err)
 		setErr(rsp, common.ServerError, "")
@@ -106,7 +106,7 @@ func (s *server) SendMsgAll(c context.Context, req *protobuf.SendMsgAllReq) (rsp
 	rsp = &protobuf.SendMsgAllRsp{}
 
 	data := models.GetMsgData(req.GetUserId(), req.GetSeq(), req.GetCms(), req.GetMsg())
-	websocket.AllSendMessages(req.GetAppId(), req.GetUserId(), data)
+	websocket.AllSendMessages(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId(), data)
 
 	setErr(rsp, common.OK, "")
 

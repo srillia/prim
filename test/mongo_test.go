@@ -21,7 +21,7 @@ func TestGetOne(t *testing.T) {
 
 	t.Log("hello world")
 
-	sysUser := mongolib.FindOne(mongolib.GetConn("prim_message"), bson.M{"account": "13533585237"}, &models.PrimSysClient{})
+	sysUser, _ := mongolib.FindOne(mongolib.GetConn("prim_message"), bson.M{"account": "13533585237"}, models.PrimSysClient{})
 	fmt.Printf("%v", sysUser)
 }
 

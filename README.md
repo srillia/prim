@@ -215,7 +215,7 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 
 #### 3.1.3 客户端连接的管理
 - 当前程序有多少用户连接，还需要对用户广播的需要，这里我们就需要一个管理者(clientManager)，处理这些事件:
-- 记录全部的连接、登录用户的可以通过 **appId+uuid** 查到用户连接
+- 记录全部的连接、登录用户的可以通过 **appPlatform+uuid** 查到用户连接
 - 使用map存储，就涉及到多协程并发读写的问题，所以需要加读写锁
 - 定义四个channel ，分别处理客户端建立连接、用户登录、断开连接、全员广播事件
 
@@ -224,7 +224,7 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 type ClientManager struct {
 	Clients     map[*Client]bool   // 全部的连接
 	ClientsLock sync.RWMutex       // 读写锁
-	Users       map[string]*Client // 登录的用户 // appId+uuid
+	Users       map[string]*Client // 登录的用户 // appPlatform+uuid
 	UserLock    sync.RWMutex       // 读写锁
 	Register    chan *Client       // 连接连接处理
 	Login       chan *login        // 用户登录处理
@@ -324,7 +324,7 @@ func (c *Client) read() {
 
 - 登录发送数据示例:
 ```
-{"seq":"1565336219141-266129","cmd":"login","data":{"userId":"马远","appId":101}}
+{"seq":"1565336219141-266129","cmd":"login","data":{"userId":"马远","appPlatform":101}}
 ```
 - 登录响应数据示例:
 ```
@@ -333,7 +333,7 @@ func (c *Client) read() {
 - websocket是双向的数据通讯，可以连续发送，如果发送的数据需要服务端回复，就需要一个**seq**来确定服务端的响应是回复哪一次的请求数据
 - cmd 是用来确定动作，websocket没有类似于http的url,所以规定 cmd 是什么动作
 - 目前的动作有:login/heartbeat 用来发送登录请求和连接保活(长时间没有数据发送的长连接容易被浏览器、移动中间商、nginx、服务端程序断开)
-- 为什么需要AppId,UserId是表示用户的唯一字段，设计的时候为了做成通用性，设计AppId用来表示用户在哪个平台登录的(web、app、ios等)，方便后续扩展
+- 为什么需要AppPlatform,UserId是表示用户的唯一字段，设计的时候为了做成通用性，设计AppPlatform用来表示用户在哪个平台登录的(web、app、ios等)，方便后续扩展
 
 - **request_model.go** 约定的请求数据格式
 
@@ -349,7 +349,7 @@ type Request struct {
 // 登录请求数据
 type Login struct {
 	ServiceToken string `json:"serviceToken"` // 验证用户是否登录
-	AppId        uint32 `json:"appId,omitempty"`
+	AppPlatform        uint32 `json:"appPlatform,omitempty"`
 	UserId       string `json:"userId,omitempty"`
 }
 
@@ -462,7 +462,7 @@ ws.onclose = function(evt) {
 
 ```
 登录:
-ws.send('{"seq":"2323","cmd":"login","data":{"userId":"11","appId":101}}');
+ws.send('{"seq":"2323","cmd":"login","data":{"userId":"11","appPlatform":101}}');
 
 心跳:
 ws.send('{"seq":"2324","cmd":"heartbeat","data":{}}');
@@ -900,7 +900,7 @@ upstream  go-acc
 - http接口，获取登录、连接数量 完成
 - http接口，发送push、查询有多少人在线 完成
 - grpc 程序内部通讯，发送消息 完成
-- appIds 一个用户在多个平台登录
+- appPlatforms 一个用户在多个平台登录
 - 界面，把所有在线的人拉倒一个群里面，发送消息 完成
 - ~~单聊~~、群聊 完成
 - 实现分布式，水平扩张 完成

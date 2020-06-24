@@ -31,11 +31,11 @@ func Register(key string, value DisposeFunc) {
 	return
 }
 
-func getHandlers(key string) (value DisposeFunc, ok bool) {
+func getHandlers(key string) (handle DisposeFunc, ok bool) {
 	handlersRWMutex.RLock()
 	defer handlersRWMutex.RUnlock()
 
-	value, ok = handlers[key]
+	handle, ok = handlers[key]
 
 	return
 }
@@ -45,17 +45,15 @@ func ProcessData(client *Client, message []byte) {
 
 	fmt.Println("处理数据", client.Addr, string(message))
 
-
-
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("处理数据 stop", r)
 		}
 	}()
 
-	request := &models.Request{}
+	acc := &models.Acc{}
 
-	err := json.Unmarshal(message, request)
+	err := json.Unmarshal(message, acc)
 	if err != nil {
 		fmt.Println("处理数据 json Unmarshal", err)
 		client.SendMsg([]byte("数据不合法"))
@@ -63,7 +61,7 @@ func ProcessData(client *Client, message []byte) {
 		return
 	}
 
-	requestData, err := json.Marshal(request.Data)
+	requestData, err := json.Marshal(acc.Msg)
 	if err != nil {
 		fmt.Println("处理数据 json Marshal", err)
 		client.SendMsg([]byte("处理数据失败"))
@@ -71,8 +69,8 @@ func ProcessData(client *Client, message []byte) {
 		return
 	}
 
-	seq := request.Seq
-	cmd := request.Cmd
+	seq := acc.Seq
+	action := acc.Action
 
 	var (
 		code uint32
@@ -81,19 +79,19 @@ func ProcessData(client *Client, message []byte) {
 	)
 
 	// request
-	fmt.Println("acc_request", cmd, client.Addr)
+	fmt.Println("acc_request", action, client.Addr)
 
 	// 采用 map 注册的方式
-	if value, ok := getHandlers(cmd); ok {
-		code, msg, data = value(client, seq, requestData)
+	if handle, ok := getHandlers(action); ok {
+		code, msg, data = handle(client, seq, requestData)
 	} else {
 		code = common.RoutingNotExist
-		fmt.Println("处理数据 路由不存在", client.Addr, "cmd", cmd)
+		fmt.Println("处理数据 路由不存在", client.Addr, "action", action)
 	}
 
 	msg = common.GetErrorMessage(code, msg)
 
-	responseHead := models.NewResponseHead(seq, cmd, code, msg, data)
+	responseHead := models.NewResponseHead(seq, action, code, msg, data)
 
 	headByte, err := json.Marshal(responseHead)
 	if err != nil {
@@ -104,7 +102,7 @@ func ProcessData(client *Client, message []byte) {
 
 	client.SendMsg(headByte)
 
-	fmt.Println("acc_response send", client.Addr, client.AppId, client.UserId, "cmd", cmd, "code", code)
+	fmt.Println("acc_response send", client.Addr, client.AppPlatform, client.UserId, "action", action, "code", code)
 
 	return
 }

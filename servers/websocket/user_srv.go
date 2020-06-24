@@ -46,34 +46,34 @@ func UserList() (userList []string) {
 }
 
 // 查询用户是否在线
-func CheckUserOnline(appId uint32, userId string) (online bool) {
+func CheckUserOnline(sysAccount string, appPlatform string, userId string) (online bool) {
 	// 全平台查询
-	if appId == 0 {
-		for _, appId := range GetAppIds() {
-			online, _ = checkUserOnline(appId, userId)
+	if appPlatform == "all" {
+		for _, platform := range GetAppPlatforms() {
+			online, _ = checkUserOnline(sysAccount, platform, userId)
 			if online == true {
 				break
 			}
 		}
 	} else {
-		online, _ = checkUserOnline(appId, userId)
+		online, _ = checkUserOnline(sysAccount, appPlatform, userId)
 	}
 
 	return
 }
 
 // 查询用户 是否在线
-func checkUserOnline(appId uint32, userId string) (online bool, err error) {
-	key := GetUserKey(appId, userId)
+func checkUserOnline(sysAccount string, appPlatform string, userId string) (online bool, err error) {
+	key := GetUserKey(sysAccount, appPlatform, userId)
 	userOnline, err := cache.GetUserOnlineInfo(key)
 	if err != nil {
 		if err == redis.Nil {
-			fmt.Println("GetUserOnlineInfo", appId, userId, err)
+			fmt.Println("GetUserOnlineInfo", sysAccount, userId, err)
 
 			return false, nil
 		}
 
-		fmt.Println("GetUserOnlineInfo", appId, userId, err)
+		fmt.Println("GetUserOnlineInfo", sysAccount, userId, err)
 
 		return
 	}
@@ -83,23 +83,23 @@ func checkUserOnline(appId uint32, userId string) (online bool, err error) {
 	return
 }
 
-// 给全体用户发消息
-func SendMessageToReceivers(msg *models.Msg) (sendResults bool, err error) {
+//给所有的receiverIds发送信息，如果receiverIds为一个，为一对一聊天
+func SendMessageToReceivers(message interface{}, client *Client, receiverIds []string) (sendResults bool, err error) {
 	sendResults = true
 
 	currentTime := uint64(time.Now().Unix())
 	servers, err := cache.GetServerAll(currentTime)
 	if err != nil {
-		fmt.Println("给全体用户发消息", err)
+		fmt.Println("所有服务器正常", err)
 
 		return
 	}
 
 	for _, server := range servers {
 		if IsLocal(server) {
-			SendMessagesLocally(msg)
+			SendMessagesLocally(message, client, receiverIds)
 		} else {
-			//grpcclient.SendMsgAll(server, msgId, appId, userId, cmd, message)
+			//grpcclient.SendMsgAll(server, msgId, appPlatform, userId, cmd, message)
 			//todo: 处理非本地服务器的消息发送,集群使用的时候需要做RPC处理
 		}
 	}
@@ -107,42 +107,39 @@ func SendMessageToReceivers(msg *models.Msg) (sendResults bool, err error) {
 	return
 }
 
-// 全员广播
-func SendMessagesLocally(msg *models.Msg) {
+//向所有的receiverIds发送信息
+func SendMessagesLocally(msgData interface{}, client *Client, receiverIds []string) {
 
-	receiverIds := msg.ReceiverIds
-
-	for _, receiId := range receiverIds {
-		userKey := GetUserKey(msg.AppId, receiId)
-		if value, ok := clientManager.Users[userKey]; ok {
-			client := value
-			message, _ := json.Marshal(msg)
+	//获取redis 保存的userKey的格式
+	userKeys := GetUserKeysNeedMsging(client.SysAccount, client.AppPlatform, client.UserId, receiverIds)
+	for _, userKey := range userKeys {
+		if client, ok := clientManager.Users[userKey]; ok {
+			message, _ := json.Marshal(msgData)
 			client.SendMsg(message)
 		} else {
 			// todo: 如果对方不在线，将离线数据存到mongo中,临时保存
-
 		}
 	}
 }
 
 // 给用户发送消息
-func SendUserMessage(appId uint32, userId string, msgId, message string) (sendResults bool, err error) {
+func SendUserMessage(sysAccount string, appPlatform string, userId string, msgId, message string) (sendResults bool, err error) {
 
 	data := models.GetTextMsgData(userId, msgId, message)
 
 	// TODO::需要判断不在本机的情况
-	sendResults, err = SendUserMessageLocal(appId, userId, data)
+	sendResults, err = SendUserMessageLocal(sysAccount, appPlatform, userId, data)
 	if err != nil {
-		fmt.Println("给用户发送消息", appId, userId, err)
+		fmt.Println("给用户发送消息", appPlatform, userId, err)
 	}
 
 	return
 }
 
 // 给本机用户发送消息
-func SendUserMessageLocal(appId uint32, userId string, data string) (sendResults bool, err error) {
+func SendUserMessageLocal(sysAccount string, appPlatform string, userId string, data string) (sendResults bool, err error) {
 
-	client := GetUserClient(appId, userId)
+	client := GetUserClient(sysAccount, appPlatform, userId)
 	if client == nil {
 		err = errors.New("用户不在线")
 		//TODO 用户不在线存进MongoDB数据库
@@ -157,7 +154,7 @@ func SendUserMessageLocal(appId uint32, userId string, data string) (sendResults
 }
 
 // 给全体用户发消息
-func SendUserMessageAll(appId uint32, userId string, msgId, cmd, message string) (sendResults bool, err error) {
+func SendUserMessageAll(sysAccount string, appPlatform string, userId string, msgId, cmd, message string) (sendResults bool, err error) {
 	sendResults = true
 
 	currentTime := uint64(time.Now().Unix())
@@ -171,9 +168,9 @@ func SendUserMessageAll(appId uint32, userId string, msgId, cmd, message string)
 	for _, server := range servers {
 		if IsLocal(server) {
 			data := models.GetMsgData(userId, msgId, cmd, message)
-			AllSendMessages(appId, userId, data)
+			AllSendMessages(sysAccount, appPlatform, userId, data)
 		} else {
-			grpcclient.SendMsgAll(server, msgId, appId, userId, cmd, message)
+			grpcclient.SendMsgAll(server, msgId, appPlatform, userId, cmd, message)
 		}
 	}
 

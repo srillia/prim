@@ -351,13 +351,13 @@
             // person = prompt("请输入你的名字", "hello-" + currentTime());
             // if (person != null) {
             //     console.log("用户准备登陆:" + person);
-            //     ws.send('{"seq":"' + sendId() + '","cmd":"login","data":{"userId":"' + person + '","appId":101}}');
+            //     ws.send('{"seq":"' + sendId() + '","cmd":"login","data":{"userId":"' + person + '","appPlatform":101}}');
             // }
 
             person = getName();
             // person = randomNumber(10000, 99999)
             console.log("用户准备登陆:" + person);
-            ws.send('{"seq":"' + sendId() + '","cmd":"login","data":{"userId":"' + person + '","appId":101}}');
+            ws.send('{"seq":"' + sendId() + '","cmd":"login","data":{"userId":"' + person + '","appPlatform":101}}');
 
             // 定时心跳
             setInterval(heartbeat, 30 * 1000)
@@ -421,7 +421,7 @@
                         type: "POST",
                         url: 'http://{{ .httpUrl }}/user/sendMessage',
                         data: {
-                            appId: "101",
+                            appPlatform: "101",
                             userId: name,
                             msgId: sendId(),
                             message: msg,
@@ -443,7 +443,7 @@
                     type: "POST",
                     url: 'http://{{ .httpUrl }}/user/sendMessageAll',
                     data: {
-                        appId: "101",
+                        appPlatform: "101",
                         userId: person,
                         msgId: sendId(),
                         message: msg,

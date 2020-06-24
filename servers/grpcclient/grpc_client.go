@@ -20,7 +20,7 @@ import (
 // rpc client
 // 给全体用户发送消息
 // link::https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_client/main.go
-func SendMsgAll(server *models.Server, seq string, appId uint32, userId string, cmd string, message string) (sendMsgId string, err error) {
+func SendMsgAll(server *models.Server, seq string, appPlatform string, userId string, cmd string, message string) (sendMsgId string, err error) {
 	fmt.Println("查看是否调用了grpc_client.go。SendMsgAll-------------")
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(server.String(), grpc.WithInsecure())
@@ -36,11 +36,11 @@ func SendMsgAll(server *models.Server, seq string, appId uint32, userId string, 
 	defer cancel()
 
 	req := protobuf.SendMsgAllReq{
-		Seq:    seq,
-		AppId:  appId,
-		UserId: userId,
-		Cms:    cmd,
-		Msg:    message,
+		Seq:         seq,
+		AppPlatform: appPlatform,
+		UserId:      userId,
+		Cms:         cmd,
+		Msg:         message,
 	}
 	rsp, err := c.SendMsgAll(ctx, &req)
 	if err != nil {

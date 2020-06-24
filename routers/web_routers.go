@@ -25,15 +25,15 @@ func Init(router *gin.Engine) {
 	{
 		userRouter.GET("/list", user.List)
 		userRouter.GET("/online", user.Online)
-		userRouter.POST("/sendMessage", user.SendMessage)
-		userRouter.POST("/sendMessageAll", user.SendMessageAll)
-		userRouter.GET("/sendMessageTest", user.SendMessageTest)
+		//userRouter.POST("/sendMessage", user.SendMessage)
+		//userRouter.POST("/sendMessageAll", user.SendMessageAll)
+		//userRouter.GET("/sendMessageTest", user.SendMessageTest)
 	}
 
 	// 用户组
 	sysclientRouter := router.Group("/sysclient")
 	{
-		sysclientRouter.POST("/createSysclient", sysclient.CreateSysclientByPhoneNum)
+		sysclientRouter.POST("/createSysclient", sysclient.CreateSysclient)
 		sysclientRouter.GET("/getSysclient", sysclient.GetSysclientByAccount)
 		sysclientRouter.GET("/getTempKey", sysclient.GetTempUserKeyBySysclientAuthCode)
 	}

@@ -20,7 +20,8 @@ const (
 type UserOnline struct {
 	AccIp         string `json:"accIp"`         // acc Ip
 	AccPort       string `json:"accPort"`       // acc 端口
-	AppId         uint32 `json:"appId"`         // appId
+	AppPlatform   string `json:"appPlatform"`   // appPlatform
+	SysAccount    string `json:"sysAccount"`    // appPlatform
 	UserId        string `json:"userId"`        // 用户Id
 	ClientIp      string `json:"clientIp"`      // 客户端Ip
 	ClientPort    string `json:"clientPort"`    // 客户端端口
@@ -35,12 +36,13 @@ type UserOnline struct {
 /**********************  数据处理  *********************************/
 
 // 用户登录
-func UserLogin(accIp, accPort string, appId uint32, userId string, addr string, loginTime uint64) (userOnline *UserOnline) {
+func UserLogin(accIp, accPort string, appPlatform string, sysAccount string, userId string, addr string, loginTime uint64) (userOnline *UserOnline) {
 
 	userOnline = &UserOnline{
 		AccIp:         accIp,
 		AccPort:       accPort,
-		AppId:         appId,
+		AppPlatform:   appPlatform,
+		SysAccount:    sysAccount,
 		UserId:        userId,
 		ClientIp:      addr,
 		LoginTime:     loginTime,
@@ -82,13 +84,13 @@ func (u *UserOnline) IsOnline() (online bool) {
 	currentTime := uint64(time.Now().Unix())
 
 	if u.HeartbeatTime < (currentTime - heartbeatTimeout) {
-		fmt.Println("用户是否在线 心跳超时", u.AppId, u.UserId, u.HeartbeatTime)
+		fmt.Println("用户是否在线 心跳超时", u.AppPlatform, u.UserId, u.HeartbeatTime)
 
 		return
 	}
 
 	if u.IsLogoff {
-		fmt.Println("用户是否在线 用户已经下线", u.AppId, u.UserId)
+		fmt.Println("用户是否在线 用户已经下线", u.AppPlatform, u.UserId)
 
 		return
 	}

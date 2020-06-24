@@ -25,8 +25,9 @@ service AccServer {
 
 // 查询用户是否在线
 message QueryUsersOnlineReq {
-    uint32 appId = 1; // AppID
-    string userId = 2; // 用户ID
+    string sysAccount = 1; // AppPlatform
+    string appPlatform = 2; // AppPlatform
+    string userId = 3; // 用户ID
 }
 
 message QueryUsersOnlineRsp {
@@ -38,12 +39,13 @@ message QueryUsersOnlineRsp {
 // 发送消息
 message SendMsgReq {
     string seq = 1; // 序列号
-    uint32 appId = 2; // 用户ID
-    string userId = 3; // 用户ID
-    string cms = 4; // cms 动作: msg/enter/exit
-    string type = 5; // type 消息类型，默认是 text
-    string msg = 6; // msg
-    bool isLocal = 7; // 是否查询本机 acc内部调用为:true(本机查询不到即结束)
+    string sysAccount = 2; // 用户ID
+    string appPlatform = 3; // 用户ID
+    string userId = 4; // 用户ID
+    string cms = 5; // cms 动作: msg/enter/exit
+    string type = 6; // type 消息类型，默认是 text
+    string msg = 7; // msg
+    bool isLocal = 8; // 是否查询本机 acc内部调用为:true(本机查询不到即结束)
 }
 
 message SendMsgRsp {
@@ -55,11 +57,12 @@ message SendMsgRsp {
 // 发送消息
 message SendMsgAllReq {
     string seq = 1; // 序列号
-    uint32 appId = 2; // 用户ID
-    string userId = 3; // 用户ID
-    string cms = 4; // cms 动作: msg/enter/exit
-    string type = 5; // type 消息类型，默认是 text
-    string msg = 6; // msg
+    string sysAccount = 2; // 用户ID
+    string appPlatform = 3; // 用户ID
+    string userId = 4; // 用户ID
+    string cms = 5; // cms 动作: msg/enter/exit
+    string type = 6; // type 消息类型，默认是 text
+    string msg = 7; // msg
 }
 
 message SendMsgAllRsp {

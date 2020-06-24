@@ -18,26 +18,28 @@ const (
 	heartbeatExpirationTime = 6 * 60
 )
 
-// 用户登录
-type login struct {
-	AppId  uint32
-	UserId string
-	Client *Client
-}
-
-// 读取客户端数据
-func (l *login) GetKey() (key string) {
-	key = GetUserKey(l.AppId, l.UserId)
-
-	return
-}
+//todo 下面注释做废
+//// 用户登录
+//type login struct {
+//	AppPlatform  uint32
+//	UserId string
+//	Client *Client
+//}
+//
+//// 读取客户端数据
+//func (l *login) GetKey() (key string) {
+//	key = GetUserKey(l., l.UserId)
+//
+//	return
+//}
 
 // 用户连接
 type Client struct {
 	Addr          string          // 客户端地址
 	Socket        *websocket.Conn // 用户连接
 	Send          chan []byte     // 待发送的数据
-	AppId         uint32          // 登录的平台Id app/web/ios
+	AppPlatform   string          // 登录的平台Id web/android/ios
+	SysAccount    string          // 登录用户,所属于的系统
 	UserId        string          // 用户Id，用户登录以后才有
 	FirstTime     uint64          // 首次连接事件
 	HeartbeatTime uint64          // 用户上次心跳时间
@@ -45,10 +47,13 @@ type Client struct {
 }
 
 // 初始化
-func NewClient(addr string, socket *websocket.Conn, firstTime uint64) (client *Client) {
+func NewClient(addr string, socket *websocket.Conn, sysAccount string, appPlatform string, userId string, firstTime uint64) (client *Client) {
 	client = &Client{
 		Addr:          addr,
 		Socket:        socket,
+		SysAccount:    sysAccount,
+		AppPlatform:   appPlatform,
+		UserId:        userId,
 		Send:          make(chan []byte, 100),
 		FirstTime:     firstTime,
 		HeartbeatTime: firstTime,
@@ -59,7 +64,7 @@ func NewClient(addr string, socket *websocket.Conn, firstTime uint64) (client *C
 
 // 读取客户端数据
 func (c *Client) GetKey() (key string) {
-	key = GetUserKey(c.AppId, c.UserId)
+	key = GetUserKey(c.SysAccount, c.AppPlatform, c.UserId)
 
 	return
 }
@@ -144,14 +149,14 @@ func (c *Client) close() {
 	close(c.Send)
 }
 
-// 用户登录
-func (c *Client) Login(appId uint32, userId string, loginTime uint64) {
-	c.AppId = appId
-	c.UserId = userId
-	c.LoginTime = loginTime
-	// 登录成功=心跳一次
-	c.Heartbeat(loginTime)
-}
+// todo，此方法作废
+//func (c *Client) Login(appPlatform uint32, userId string, loginTime uint64) {
+//	c.AppPlatform = appPlatform
+//	c.UserId = userId
+//	c.LoginTime = loginTime
+//	// 登录成功=心跳一次
+//	c.Heartbeat(loginTime)
+//}
 
 // 用户心跳
 func (c *Client) Heartbeat(currentTime uint64) {
@@ -169,7 +174,7 @@ func (c *Client) IsHeartbeatTimeout(currentTime uint64) (timeout bool) {
 	return
 }
 
-// 是否登录了
+//todo 作废方法，准备删除
 func (c *Client) IsLogin() (isLogin bool) {
 
 	// 用户登录了

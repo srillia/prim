@@ -20,10 +20,9 @@ import (
 type ClientManager struct {
 	Clients     map[*Client]bool   // 全部的连接
 	ClientsLock sync.RWMutex       // 读写锁
-	Users       map[string]*Client // 登录的用户 // appId+uuid
+	Users       map[string]*Client // 登录的用户 // appPlatform+uuid
 	UserLock    sync.RWMutex       // 读写锁
 	Register    chan *Client       // 连接连接处理
-	Login       chan *login        // 用户登录处理
 	Unregister  chan *Client       // 断开连接处理程序
 	Broadcast   chan []byte        // 广播 向全部成员发送数据
 }
@@ -33,7 +32,6 @@ func NewClientManager() (clientManager *ClientManager) {
 		Clients:    make(map[*Client]bool),
 		Users:      make(map[string]*Client),
 		Register:   make(chan *Client, 1000),
-		Login:      make(chan *login, 1000),
 		Unregister: make(chan *Client, 1000),
 		Broadcast:  make(chan []byte, 1000),
 	}
@@ -42,9 +40,41 @@ func NewClientManager() (clientManager *ClientManager) {
 }
 
 // 获取用户key
-func GetUserKey(appId uint32, userId string) (key string) {
-	key = fmt.Sprintf("%d_%s", appId, userId)
+func GetUserKey(account string, appPlatform string, userId string) (key string) {
+	key = fmt.Sprintf("%s_%s_%s", account, appPlatform, userId)
 
+	return
+}
+
+// 获取用户key
+func GetUserKeysInAllPlatform(account string, userId string) (keys []string) {
+	for _, platform := range GetAppPlatforms() {
+		keys = append(keys, fmt.Sprintf("%s_%s_%s", account, platform, userId))
+	}
+	return
+}
+
+// 获取用户key
+func GetUserKeysExcludeThePlatform(account string, appPlatform string, userId string) (keys []string) {
+	for _, platform := range GetAppPlatforms() {
+		if platform != appPlatform {
+			keys = append(keys, fmt.Sprintf("%s_%s_%s", account, platform, userId))
+		}
+	}
+	return
+}
+
+// 获取用户key
+func GetUserKeysNeedMsging(account string, appPlatform string, senderId string, receiverIds []string) (keys []string) {
+	//先获取我其它平台的用户，这些用户要需要接受信息
+	keys = GetUserKeysExcludeThePlatform(account, appPlatform, senderId)
+	//添加所有需要发送的用记的信息，并添加到keys 切片返回
+	for _, receiverId := range receiverIds {
+		for _, receiverIdInPlatform := range GetUserKeysInAllPlatform(account, receiverId) {
+			keys = append(keys, receiverIdInPlatform)
+		}
+
+	}
 	return
 }
 
@@ -117,12 +147,12 @@ func (manager *ClientManager) DelClients(client *Client) {
 }
 
 // 获取用户的连接
-func (manager *ClientManager) GetUserClient(appId uint32, userId string) (client *Client) {
+func (manager *ClientManager) GetUserClient(sysAccount string, appPlatform string, userId string) (client *Client) {
 
 	manager.UserLock.RLock()
 	defer manager.UserLock.RUnlock()
 
-	userKey := GetUserKey(appId, userId)
+	userKey := GetUserKey(sysAccount, appPlatform, userId)
 	if value, ok := manager.Users[userKey]; ok {
 		client = value
 	}
@@ -150,7 +180,7 @@ func (manager *ClientManager) DelUsers(client *Client) (result bool) {
 	manager.UserLock.Lock()
 	defer manager.UserLock.Unlock()
 
-	key := GetUserKey(client.AppId, client.UserId)
+	key := GetUserKey(client.SysAccount, client.AppPlatform, client.UserId)
 	if value, ok := manager.Users[key]; ok {
 		// 判断是否为相同的用户
 		if value.Addr != client.Addr {
@@ -187,7 +217,7 @@ func (manager *ClientManager) GetUserList() (userList []string) {
 
 	for _, v := range clientManager.Users {
 		userList = append(userList, v.UserId)
-		fmt.Println("GetUserList", v.AppId, v.UserId, v.Addr)
+		fmt.Println("GetUserList", v.AppPlatform, v.UserId, v.Addr)
 	}
 
 	fmt.Println("GetUserList", clientManager.Users)
@@ -228,21 +258,21 @@ func (manager *ClientManager) EventRegister(client *Client) {
 	// client.Send <- []byte("连接成功")
 }
 
-// 用户登录
-func (manager *ClientManager) EventLogin(login *login) {
-
-	client := login.Client
-	// 连接存在，在添加
-	if manager.InClient(client) {
-		userKey := login.GetKey()
-		manager.AddUsers(userKey, login.Client)
-	}
-
-	fmt.Println("EventLogin 用户登录", client.Addr, login.AppId, login.UserId)
-
-	orderId := helper.GetOrderIdTime()
-	SendUserMessageAll(login.AppId, login.UserId, orderId, models.MessageCmdEnter, "哈喽~")
-}
+//todo 作废代码
+//func (manager *ClientManager) EventLogin(login *login) {
+//
+//	client := login.Client
+//	// 连接存在，在添加
+//	if manager.InClient(client) {
+//		userKey := login.GetKey()
+//		manager.AddUsers(userKey, login.Client)
+//	}
+//
+//	fmt.Println("EventLogin 用户登录", client.Addr, login.AppPlatform, login.UserId)
+//
+//	orderId := helper.GetOrderIdTime()
+//	SendUserMessageAll(login.AppPlatform, login.UserId, orderId, models.MessageCmdEnter, "哈喽~")
+//}
 
 // 用户断开连接
 func (manager *ClientManager) EventUnregister(client *Client) {
@@ -266,11 +296,11 @@ func (manager *ClientManager) EventUnregister(client *Client) {
 	// 关闭 chan
 	// close(client.Send)
 
-	fmt.Println("EventUnregister 用户断开连接", client.Addr, client.AppId, client.UserId)
+	fmt.Println("EventUnregister 用户断开连接", client.Addr, client.AppPlatform, client.UserId)
 
 	if client.UserId != "" {
 		orderId := helper.GetOrderIdTime()
-		SendUserMessageAll(client.AppId, client.UserId, orderId, models.MessageCmdExit, "用户已经离开~")
+		SendUserMessageAll(client.SysAccount, client.AppPlatform, client.UserId, orderId, models.MessageCmdExit, "用户已经离开~")
 	}
 }
 
@@ -282,9 +312,10 @@ func (manager *ClientManager) start() {
 			// 建立连接事件
 			manager.EventRegister(conn)
 
-		case login := <-manager.Login:
-			// 用户登录
-			manager.EventLogin(login)
+		//todo 下面代码作废
+		//case login := <-manager.Login:
+		//	// 用户登录
+		//	manager.EventLogin(login)
 
 		case conn := <-manager.Unregister:
 			// 断开连接事件
@@ -312,7 +343,7 @@ func GetManagerInfo(isDebug string) (managerInfo map[string]interface{}) {
 	managerInfo["clientsLen"] = clientManager.GetClientsLen()
 	managerInfo["usersLen"] = clientManager.GetUsersLen()
 	managerInfo["chanRegisterLen"] = len(clientManager.Register)
-	managerInfo["chanLoginLen"] = len(clientManager.Login)
+	//managerInfo["chanLoginLen"] = len(clientManager.Login)
 	managerInfo["chanUnregisterLen"] = len(clientManager.Unregister)
 	managerInfo["chanBroadcastLen"] = len(clientManager.Broadcast)
 
@@ -335,8 +366,8 @@ func GetManagerInfo(isDebug string) (managerInfo map[string]interface{}) {
 
 //TODO 获取在线用户的信息
 // 获取用户所在的连接
-func GetUserClient(appId uint32, userId string) (client *Client) {
-	client = clientManager.GetUserClient(appId, userId)
+func GetUserClient(sysAccount string, appPlatform string, userId string) (client *Client) {
+	client = clientManager.GetUserClient(sysAccount, appPlatform, userId)
 
 	return
 }
@@ -365,9 +396,9 @@ func GetUserList() (userList []string) {
 }
 
 // 全员广播
-func AllSendMessages(appId uint32, userId string, data string) {
-	fmt.Println("全员广播", appId, userId, data)
+func AllSendMessages(sysAccount string, appPlatform string, userId string, data string) {
+	fmt.Println("全员广播", sysAccount, appPlatform, userId, data)
 
-	ignore := clientManager.GetUserClient(appId, userId)
+	ignore := clientManager.GetUserClient(sysAccount, appPlatform, userId)
 	clientManager.sendAll([]byte(data), ignore)
 }

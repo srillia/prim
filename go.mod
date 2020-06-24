@@ -7,7 +7,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.4.0
 	github.com/go-redis/redis v0.0.0-20190719092155-6bc7daa5b1e8
-	github.com/golang/protobuf v1.3.3
+	github.com/golang/protobuf v1.4.1
 	github.com/gorilla/websocket v1.4.0
 	github.com/hashicorp/hcl v1.0.1-0.20190611123218-cf7d376da96d // indirect
 	github.com/json-iterator/go v1.1.7 // indirect
@@ -29,8 +29,9 @@ require (
 	go.mongodb.org/mongo-driver v1.3.1
 	golang.org/x/sys v0.0.0-20190531175056-4c3a928424d2
 	golang.org/x/text v0.3.2
-	google.golang.org/genproto v0.0.0-20200326112834-f447254575fd
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/grpc v1.27.0
+	google.golang.org/protobuf v1.24.0
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

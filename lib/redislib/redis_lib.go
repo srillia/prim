@@ -15,10 +15,11 @@ import (
 )
 
 var (
-	client *redis.Client
+	client       *redis.Client
+	primTokeyKey = "primTokenKey"
 )
 
-func ExampleNewClient() {
+func NewClient() {
 
 	client = redis.NewClient(&redis.Options{
 		Addr:         viper.GetString("redis.addr"),
@@ -38,26 +39,22 @@ func GetClient() (c *redis.Client) {
 	return client
 }
 
-func SaveTempKey(sysAccount string, userId string, tempKey string) {
-	//hash key 是由 sysAccount加用户id组成
-	hkey := sysAccount + ":tempKey"
-
-	number, err := client.Do("hSet", hkey, userId, tempKey).Int()
-	if err != nil {
-		fmt.Println("saveTempKeyInRedis", hkey, number, err)
-		return
-	}
+func SaveToken(tokenField string, tokenValue string) {
+	client.Do("set", addPrefix(tokenField), tokenValue)
+	client.Do("expire", addPrefix(tokenField), 12*3600)
 }
 
-func CheckTempKey(sysAccount string, userId string) bool {
-	//hash key 是由 sysAccount加用户id组成
-	hkey := sysAccount + ":tempKey"
-	requestTempKey := common.GenerateTempKey(sysAccount, userId)
-	tempKey, err := client.Do("hGet", hkey, userId).String()
-	if err != nil {
-		if requestTempKey == tempKey {
-			return true
-		}
+func addPrefix(tokenField string) (token string) {
+	return primTokeyKey + ":" + tokenField
+}
+
+func PassCheckToken(token string) (bool, []string) {
+	//处理token
+	tokenValue, err := client.Do("get", addPrefix(token)).String()
+	arr := common.ParseToken(tokenValue)
+	//err==有nil说明有值
+	if err == nil {
+		return true, arr
 	}
-	return false
+	return false, arr
 }

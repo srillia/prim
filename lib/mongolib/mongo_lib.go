@@ -9,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
-	"prim/initialize"
 	"time"
 )
 
@@ -17,8 +16,7 @@ var (
 	client *mongo.Client
 )
 
-func init() {
-	initialize.InitConfig()
+func NewClient() {
 	addr := viper.GetString("mongo.addr")
 	password := viper.GetString("mongo.password")
 	db := viper.GetString("mongo.db")
@@ -59,14 +57,11 @@ func InsertOneData(coll *mongo.Collection, m bson.M) (interface{}, error) {
 	return id, err
 }
 
-func FindOne(coll *mongo.Collection, m interface{}, info interface{}) interface{} {
+func FindOne(coll *mongo.Collection, m interface{}, info interface{}) (interface{}, error) {
 	filter := m
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	err := coll.FindOne(ctx, filter).Decode(info)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return info
+	err := coll.FindOne(ctx, filter).Decode(&info)
+	return info, err
 }
 
 func FindOneData(coll *mongo.Collection, m bson.M, info interface{}) interface{} {

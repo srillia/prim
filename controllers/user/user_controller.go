@@ -12,8 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"prim/common"
 	"prim/controllers"
-	"prim/lib/cache"
-	"prim/models"
 	"prim/servers/websocket"
 	"strconv"
 )
@@ -21,10 +19,10 @@ import (
 // 查看全部在线用户
 func List(c *gin.Context) {
 
-	appIdStr := c.Query("appId")
-	appId, _ := strconv.ParseInt(appIdStr, 10, 32)
+	appPlatformStr := c.Query("appPlatform")
+	appPlatform, _ := strconv.ParseInt(appPlatformStr, 10, 32)
 
-	fmt.Println("http_request 查看全部在线用户", appId)
+	fmt.Println("http_request 查看全部在线用户", appPlatform)
 
 	data := make(map[string]interface{})
 
@@ -38,96 +36,97 @@ func List(c *gin.Context) {
 func Online(c *gin.Context) {
 
 	userId := c.Query("userId")
-	appIdStr := c.Query("appId")
+	appPlatformStr := c.Query("appPlatform")
+	sysAccount := c.Query("sysAccount")
 
-	fmt.Println("http_request 查看用户是否在线", userId, appIdStr)
-	appId, _ := strconv.ParseInt(appIdStr, 10, 32)
+	fmt.Println("http_request 查看用户是否在线", userId, appPlatformStr)
+	appPlatform, _ := strconv.ParseInt(appPlatformStr, 10, 32)
 
 	data := make(map[string]interface{})
 
-	online := websocket.CheckUserOnline(uint32(appId), userId)
+	online := websocket.CheckUserOnline(sysAccount, string(appPlatform), userId)
 	data["userId"] = userId
 	data["online"] = online
 
 	controllers.Response(c, common.OK, "", data)
 }
 
-// 给用户发送消息
-func SendMessage(c *gin.Context) {
-	// 获取参数
-	appIdStr := c.PostForm("appId")
-	userId := c.PostForm("userId")
-	msgId := c.PostForm("msgId")
-	message := c.PostForm("message")
-
-	//拿到请求中的token
-	token := c.Request.Header.Get("authorization")
-	fmt.Print(token)
-	fmt.Println("http_request 给用户发送消息", appIdStr, userId, msgId, message)
-	appId, _ := strconv.ParseInt(appIdStr, 10, 32)
-
-	// TODO::进行用户权限认证，一般是客户端传入TOKEN，然后检验TOKEN是否合法，通过TOKEN解析出来用户ID
-	// 本项目只是演示，所以直接过去客户端传入的用户ID(userId)
-
-	data := make(map[string]interface{})
-
-	if cache.SeqDuplicates(msgId) {
-		fmt.Println("给用户发送消息 重复提交:", msgId)
-		controllers.Response(c, common.OK, "", data)
-
-		return
-	}
-
-	sendResults, err := websocket.SendUserMessage(uint32(appId), userId, msgId, message)
-	if err != nil {
-		data["sendResultsErr"] = err.Error()
-	}
-
-	data["sendResults"] = sendResults
-
-	controllers.Response(c, common.OK, "", data)
-}
-
-// 给全员发送消息
-func SendMessageAll(c *gin.Context) {
-	// 获取参数
-	appIdStr := c.PostForm("appId")
-	userId := c.PostForm("userId")
-	msgId := c.PostForm("msgId")
-	message := c.PostForm("message")
-
-	fmt.Println("http_request 给全体用户发送消息", appIdStr, userId, msgId, message)
-
-	appId, _ := strconv.ParseInt(appIdStr, 10, 32)
-
-	data := make(map[string]interface{})
-	if cache.SeqDuplicates(msgId) {
-		fmt.Println("给用户发送消息 重复提交:", msgId)
-		controllers.Response(c, common.OK, "", data)
-
-		return
-	}
-
-	sendResults, err := websocket.SendUserMessageAll(uint32(appId), userId, msgId, models.MessageCmdMsg, message)
-	if err != nil {
-		data["sendResultsErr"] = err.Error()
-
-	}
-
-	data["sendResults"] = sendResults
-
-	controllers.Response(c, common.OK, "", data)
-
-}
-
-func SendMessageTest(c *gin.Context) {
-	fmt.Println("进入测试方法", c)
-	token := c.Request.Header.Get("authorization")
-	fmt.Println("获取的token为：", token)
-	val, flag := c.GetPostForm("token")
-	if flag {
-		fmt.Println("获取的值:", val)
-	}
-
-	controllers.Response(c, common.OK, val, nil)
-}
+//// 给用户发送消息
+//func SendMessage(c *gin.Context) {
+//	// 获取参数
+//	appPlatformStr := c.PostForm("appPlatform")
+//	userId := c.PostForm("userId")
+//	msgId := c.PostForm("msgId")
+//	message := c.PostForm("message")
+//
+//	//拿到请求中的token
+//	token := c.Request.Header.Get("authorization")
+//	fmt.Print(token)
+//	fmt.Println("http_request 给用户发送消息", appPlatformStr, userId, msgId, message)
+//	appPlatform, _ := strconv.ParseInt(appPlatformStr, 10, 32)
+//
+//	// TODO::进行用户权限认证，一般是客户端传入TOKEN，然后检验TOKEN是否合法，通过TOKEN解析出来用户ID
+//	// 本项目只是演示，所以直接过去客户端传入的用户ID(userId)
+//
+//	data := make(map[string]interface{})
+//
+//	if cache.SeqDuplicates(msgId) {
+//		fmt.Println("给用户发送消息 重复提交:", msgId)
+//		controllers.Response(c, common.OK, "", data)
+//
+//		return
+//	}
+//
+//	sendResults, err := websocket.SendUserMessage(string(appPlatform), userId, msgId, message)
+//	if err != nil {
+//		data["sendResultsErr"] = err.Error()
+//	}
+//
+//	data["sendResults"] = sendResults
+//
+//	controllers.Response(c, common.OK, "", data)
+//}
+//
+//// 给全员发送消息
+//func SendMessageAll(c *gin.Context) {
+//	// 获取参数
+//	appPlatformStr := c.PostForm("appPlatform")
+//	userId := c.PostForm("userId")
+//	msgId := c.PostForm("msgId")
+//	message := c.PostForm("message")
+//
+//	fmt.Println("http_request 给全体用户发送消息", appPlatformStr, userId, msgId, message)
+//
+//	appPlatform, _ := strconv.ParseInt(appPlatformStr, 10, 32)
+//
+//	data := make(map[string]interface{})
+//	if cache.SeqDuplicates(msgId) {
+//		fmt.Println("给用户发送消息 重复提交:", msgId)
+//		controllers.Response(c, common.OK, "", data)
+//
+//		return
+//	}
+//
+//	sendResults, err := websocket.SendUserMessageAll(string(appPlatform), userId, msgId, models.MessageCmdMsg, message)
+//	if err != nil {
+//		data["sendResultsErr"] = err.Error()
+//
+//	}
+//
+//	data["sendResults"] = sendResults
+//
+//	controllers.Response(c, common.OK, "", data)
+//
+//}
+//
+//func SendMessageTest(c *gin.Context) {
+//	fmt.Println("进入测试方法", c)
+//	token := c.Request.Header.Get("authorization")
+//	fmt.Println("获取的token为：", token)
+//	val, flag := c.GetPostForm("token")
+//	if flag {
+//		fmt.Println("获取的值:", val)
+//	}
+//
+//	controllers.Response(c, common.OK, val, nil)
+//}
