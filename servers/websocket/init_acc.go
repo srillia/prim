@@ -86,7 +86,7 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 
 	var arr []string
 	var pass bool
-	//todo 现在的加密不是特别安全
+	//todo,先检测，clientManager里的client是否存在，存在删除，再建立连接
 	if pass, arr = redislib.PassCheckToken(token); pass == false {
 		//直接return,没有权限连接
 		return
