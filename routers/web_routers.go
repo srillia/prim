@@ -10,7 +10,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"prim/controllers/home"
-	"prim/controllers/sysClient"
+	"prim/controllers/sysclient"
 	"prim/controllers/systems"
 	"prim/controllers/user"
 )
