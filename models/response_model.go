@@ -34,7 +34,7 @@ type PushMsg struct {
 func NewResponseHead(seq string, cmd string, code uint32, codeMsg string, data interface{}) *Head {
 	response := NewResponse(code, codeMsg, data)
 
-	return &Head{Seq: seq, Cmd: cmd, Response: response}
+	return &Head{Seq: seq, Action: cmd, Response: response}
 }
 
 func (h *Head) String() (headStr string) {
