@@ -117,9 +117,7 @@ func GetUserList(server *models.Server) (userIds []string, err error) {
 	defer conn.Close()
 
 	c := protobuf.NewAccServerClient(conn)
-
-	clientDeadline := time.Now().Add(time.Duration(5000) * time.Millisecond)
-	ctx, cancel := context.WithDeadline(context.Background(), clientDeadline)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
 	req := protobuf.GetUserListReq{}
