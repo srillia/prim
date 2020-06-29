@@ -61,6 +61,6 @@ func open() {
 
 	fmt.Println("访问页面体验:", httpUrl)
 
-	cmd := exec.Command("open", httpUrl)
-	cmd.Output()
+	action := exec.Command("open", httpUrl)
+	action.Output()
 }

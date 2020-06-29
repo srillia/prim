@@ -94,7 +94,7 @@ func (s *server) SendMsgAll(c context.Context, req *protobuf.SendMsgAllReq) (rsp
 
 	rsp = &protobuf.SendMsgAllRsp{}
 
-	data := models.GetMsgData(req.GetUserId(), req.GetSeq(), req.GetCms(), req.GetMsg())
+	data := models.GetMsgData(req.GetUserId(), req.GetSeq(), req.GetAction(), req.GetMsg())
 	websocket.AllSendMessages(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId(), data)
 
 	setErr(rsp, common.OK, "")

@@ -132,7 +132,7 @@ type SendMsgReq struct {
 	Seq                  string   `protobuf:"bytes,1,opt,name=seq,proto3" json:"seq,omitempty"`
 	AppPlatform                uint32   `protobuf:"varint,2,opt,name=appPlatform,proto3" json:"appPlatform,omitempty"`
 	UserId               string   `protobuf:"bytes,3,opt,name=userId,proto3" json:"userId,omitempty"`
-	Cms                  string   `protobuf:"bytes,4,opt,name=cms,proto3" json:"cms,omitempty"`
+	Action                  string   `protobuf:"bytes,4,opt,name=action,proto3" json:"action,omitempty"`
 	Type                 string   `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
 	Msg                  string   `protobuf:"bytes,6,opt,name=msg,proto3" json:"msg,omitempty"`
 	IsLocal              bool     `protobuf:"varint,7,opt,name=isLocal,proto3" json:"isLocal,omitempty"`
@@ -187,9 +187,9 @@ func (m *SendMsgReq) GetUserId() string {
 	return ""
 }
 
-func (m *SendMsgReq) GetCms() string {
+func (m *SendMsgReq) GetAction() string {
 	if m != nil {
-		return m.Cms
+		return m.Action
 	}
 	return ""
 }
@@ -275,7 +275,7 @@ type SendMsgAllReq struct {
 	Seq                  string   `protobuf:"bytes,1,opt,name=seq,proto3" json:"seq,omitempty"`
 	AppPlatform          string   `protobuf:"varint,2,opt,name=appPlatform,proto3" json:"appPlatform,omitempty"`
 	UserId               string   `protobuf:"bytes,3,opt,name=userId,proto3" json:"userId,omitempty"`
-	Cms                  string   `protobuf:"bytes,4,opt,name=cms,proto3" json:"cms,omitempty"`
+	Action                  string   `protobuf:"bytes,4,opt,name=action,proto3" json:"action,omitempty"`
 	Type                 string   `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
 	Msg                  string   `protobuf:"bytes,6,opt,name=msg,proto3" json:"msg,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -329,9 +329,9 @@ func (m *SendMsgAllReq) GetUserId() string {
 	return ""
 }
 
-func (m *SendMsgAllReq) GetCms() string {
+func (m *SendMsgAllReq) GetAction() string {
 	if m != nil {
-		return m.Cms
+		return m.Action
 	}
 	return ""
 }

@@ -324,14 +324,14 @@ func (c *Client) read() {
 
 - 登录发送数据示例:
 ```
-{"seq":"1565336219141-266129","cmd":"login","data":{"userId":"马远","appPlatform":101}}
+{"seq":"1565336219141-266129","action":"login","data":{"userId":"马远","appPlatform":101}}
 ```
 - 登录响应数据示例:
 ```
-{"seq":"1565336219141-266129","cmd":"login","response":{"code":200,"codeMsg":"Success","data":null}}
+{"seq":"1565336219141-266129","action":"login","response":{"code":200,"codeMsg":"Success","data":null}}
 ```
 - websocket是双向的数据通讯，可以连续发送，如果发送的数据需要服务端回复，就需要一个**seq**来确定服务端的响应是回复哪一次的请求数据
-- cmd 是用来确定动作，websocket没有类似于http的url,所以规定 cmd 是什么动作
+- action 是用来确定动作，websocket没有类似于http的url,所以规定 action 是什么动作
 - 目前的动作有:login/heartbeat 用来发送登录请求和连接保活(长时间没有数据发送的长连接容易被浏览器、移动中间商、nginx、服务端程序断开)
 - 为什么需要AppPlatform,UserId是表示用户的唯一字段，设计的时候为了做成通用性，设计AppPlatform用来表示用户在哪个平台登录的(web、app、ios等)，方便后续扩展
 
@@ -342,7 +342,7 @@ func (c *Client) read() {
 // 通用请求数据格式
 type Request struct {
 	Seq  string      `json:"seq"`            // 消息的唯一Id
-	Cmd  string      `json:"cmd"`            // 请求命令字
+	Action  string      `json:"action"`            // 请求命令字
 	Data interface{} `json:"data,omitempty"` // 数据 json
 }
 
@@ -365,7 +365,7 @@ type HeartBeat struct {
 /************************  响应数据  **************************/
 type Head struct {
 	Seq      string    `json:"seq"`      // 消息的Id
-	Cmd      string    `json:"cmd"`      // 消息的cmd 动作
+	Action      string    `json:"action"`      // 消息的action 动作
 	Response *Response `json:"response"` // 消息体
 }
 
@@ -462,13 +462,13 @@ ws.onclose = function(evt) {
 
 ```
 登录:
-ws.send('{"seq":"2323","cmd":"login","data":{"userId":"11","appPlatform":101}}');
+ws.send('{"seq":"2323","action":"login","data":{"userId":"11","appPlatform":101}}');
 
 心跳:
-ws.send('{"seq":"2324","cmd":"heartbeat","data":{}}');
+ws.send('{"seq":"2324","action":"heartbeat","data":{}}');
 
 ping 查看服务是否正常:
-ws.send('{"seq":"2325","cmd":"ping","data":{}}');
+ws.send('{"seq":"2325","action":"ping","data":{}}');
 
 关闭连接:
 ws.close();
@@ -492,7 +492,7 @@ from：消息的发送者
 ```json
 {
   "seq": "1569080188418-747717",
-  "cmd": "msg",
+  "action": "msg",
   "response": {
     "code": 200,
     "codeMsg": "Ok",

@@ -117,7 +117,7 @@ func Online(c *gin.Context) {
 //		return
 //	}
 //
-//	sendResults, err := websocket.SendUserMessageAll(string(appPlatform), userId, msgId, models.MessageCmdMsg, message)
+//	sendResults, err := websocket.SendUserMessageAll(string(appPlatform), userId, msgId, models.MessageActionMsg, message)
 //	if err != nil {
 //		data["sendResultsErr"] = err.Error()
 //

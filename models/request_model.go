@@ -13,8 +13,8 @@ package models
 //type Request struct {
 //	//客户端生成的消息唯一id，用于信息重发时的，去重工作
 //	Seq  string      `json:"seq"`            // 消息的唯一Id
-//	//Cmd是处理信息的行为路由
-//	Cmd  string      `json:"cmd"`            // 请求命令字
+//	//Action是处理信息的行为路由
+//	Action  string      `json:"action"`            // 请求命令字
 //	//信息的数据包
 //	Data interface{} `json:"data,omitempty"` // 数据 json
 //}

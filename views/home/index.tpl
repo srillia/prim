@@ -351,13 +351,13 @@
             // person = prompt("请输入你的名字", "hello-" + currentTime());
             // if (person != null) {
             //     console.log("用户准备登陆:" + person);
-            //     ws.send('{"seq":"' + sendId() + '","cmd":"login","data":{"userId":"' + person + '","appPlatform":101}}');
+            //     ws.send('{"seq":"' + sendId() + '","action":"login","data":{"userId":"' + person + '","appPlatform":101}}');
             // }
 
             person = getName();
             // person = randomNumber(10000, 99999)
             console.log("用户准备登陆:" + person);
-            ws.send('{"seq":"' + sendId() + '","cmd":"login","data":{"userId":"' + person + '","appPlatform":101}}');
+            ws.send('{"seq":"' + sendId() + '","action":"login","data":{"userId":"' + person + '","appPlatform":101}}');
 
             // 定时心跳
             setInterval(heartbeat, 30 * 1000)
@@ -369,14 +369,14 @@
             data_array = JSON.parse(evt.data);
             console.log(data_array);
 
-            if (data_array.cmd === "msg") {
+            if (data_array.action === "msg") {
                 data = data_array.response.data
                 addChatWith(msg(data.from, data.msg))
-            } else if (data_array.cmd === "enter") {
+            } else if (data_array.action === "enter") {
                 data = data_array.response.data
                 addChatWith(msg("管理员", "欢迎 " + data.from + " 加入~"))
                 addUserList(data.from)
-            } else if (data_array.cmd === "exit") {
+            } else if (data_array.action === "exit") {
                 data = data_array.response.data
                 addChatWith(msg("管理员", data.from + " 悄悄的离开了~"))
                 delUserList(data.from)
@@ -392,7 +392,7 @@
         // 心跳
         function heartbeat() {
             console.log("定时心跳:" + person);
-            ws.send('{"seq":"' + sendId() + '","cmd":"heartbeat","data":{}}');
+            ws.send('{"seq":"' + sendId() + '","action":"heartbeat","data":{}}');
 
         }
 
