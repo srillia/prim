@@ -66,35 +66,24 @@ func (s *server) SendMsg(c context.Context, req *protobuf.SendMsgReq) (rsp *prot
 
 	fmt.Println("grpc_request 给本机用户发消息", req.String())
 
-	rsp = &protobuf.SendMsgRsp{}
+	websocket.SendUserMessageLocal(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserIds(), req.Msg)
+	//if err != nil {
+	//	fmt.Println("系统错误", err)
+	//	setErr(rsp, common.ServerError, "")
+	//
+	//	return rsp, nil
+	//}
+	//
+	//if !sendResults {
+	//	fmt.Println("发送失败", err)
+	//	setErr(rsp, common.OperationFailure, "")
+	//
+	//	return rsp, nil
+	//}
+	//
+	//setErr(rsp, common.OK, "")
 
-	if req.GetIsLocal() {
-
-		// 不支持
-		setErr(rsp, common.ParameterIllegal, "")
-
-		return
-	}
-
-	data := models.GetMsgData(req.GetUserId(), req.GetSeq(), req.GetCms(), req.GetMsg())
-	sendResults, err := websocket.SendUserMessageLocal(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId(), data)
-	if err != nil {
-		fmt.Println("系统错误", err)
-		setErr(rsp, common.ServerError, "")
-
-		return rsp, nil
-	}
-
-	if !sendResults {
-		fmt.Println("发送失败", err)
-		setErr(rsp, common.OperationFailure, "")
-
-		return rsp, nil
-	}
-
-	setErr(rsp, common.OK, "")
-
-	fmt.Println("grpc_response 给本机用户发消息", rsp.String())
+	//fmt.Println("grpc_response 给本机用户发消息", rsp.String())
 	return
 }
 

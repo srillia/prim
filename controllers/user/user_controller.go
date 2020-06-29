@@ -19,15 +19,25 @@ import (
 // 查看全部在线用户
 func List(c *gin.Context) {
 
-	appPlatformStr := c.Query("appPlatform")
-	appPlatform, _ := strconv.ParseInt(appPlatformStr, 10, 32)
-
-	fmt.Println("http_request 查看全部在线用户", appPlatform)
+	//todo 此处需要鉴权
 
 	data := make(map[string]interface{})
 
 	userList := websocket.UserList()
 	data["userList"] = userList
+
+	controllers.Response(c, common.OK, "", data)
+}
+
+// 查看全部在线用户
+func ListUserMap(c *gin.Context) {
+
+	//todo 此处需要鉴权
+
+	data := make(map[string]interface{})
+
+	userMap := websocket.UserListByServer()
+	data["userList"] = userMap
 
 	controllers.Response(c, common.OK, "", data)
 }

@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func Init() {
+func CleanInit() {
 	Timer(3*time.Second, 30*time.Second, cleanConnection, "", nil, nil)
 
 }

@@ -83,17 +83,12 @@ func StartWebSocket() {
 
 func wsPage(w http.ResponseWriter, req *http.Request) {
 	token := req.URL.Query().Get("token")
-
-	var arr []string
-	var pass bool
+	pass, sysAccount, appPlatform, userId := redislib.PassCheckToken(token)
 	//todo,先检测，clientManager里的client是否存在，存在删除，再建立连接
-	if pass, arr = redislib.PassCheckToken(token); pass == false {
+	if pass == false {
 		//直接return,没有权限连接
 		return
 	}
-	sysAccount := arr[0]
-	appPlatform := arr[1]
-	userId := arr[2]
 
 	// 升级协议
 	conn, err := (&websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {

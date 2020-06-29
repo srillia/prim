@@ -50,7 +50,7 @@ func MsgController(client *Client, seq string, message []byte) (code uint32, msg
 
 	fmt.Printf("给用户发送消息:%v", msgData)
 
-	SendMessageToReceivers(msgData, client, []string{msgData.ReceiverId})
+	SendMessageToReceivers(seq, msgData, client, []string{msgData.ReceiverId})
 	return
 }
 
@@ -165,12 +165,12 @@ func HeartbeatController(client *Client, seq string, message []byte) (code uint3
 
 	fmt.Println("webSocket_request 心跳接口", client.AppPlatform, client.UserId)
 
-	if !client.IsLogin() {
-		fmt.Println("心跳接口 用户未登录", client.AppPlatform, client.UserId, seq)
-		code = common.NotLoggedIn
-
-		return
-	}
+	//if !client.IsLogin() {
+	//	fmt.Println("心跳接口 用户未登录", client.AppPlatform, client.UserId, seq)
+	//	code = common.NotLoggedIn
+	//
+	//	return
+	//}
 
 	userOnline, err := cache.GetUserOnlineInfo(client.GetKey())
 	if err != nil {

@@ -48,13 +48,13 @@ func addPrefix(tokenField string) (token string) {
 	return primTokeyKey + ":" + tokenField
 }
 
-func PassCheckToken(token string) (bool, []string) {
+func PassCheckToken(token string) (isPass bool, sysAccount string, appPlatform string, userId string) {
 	//处理token
 	tokenValue, err := client.Do("get", addPrefix(token)).String()
 	arr := common.ParseToken(tokenValue)
 	//err==有nil说明有值
 	if err == nil {
-		return true, arr
+		return true, arr[0], arr[1], arr[2]
 	}
-	return false, arr
+	return false, arr[0], arr[1], arr[2]
 }

@@ -9,7 +9,6 @@ package websocket
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
 	"prim/lib/cache"
@@ -42,6 +41,30 @@ func UserList() (userList []string) {
 		userList = append(userList, list...)
 	}
 
+	return
+}
+
+// 查询所有用户
+func UserListByServer() (userMapByServer map[string][]string) {
+
+	userMapByServer = make(map[string][]string)
+	currentTime := uint64(time.Now().Unix())
+	servers, err := cache.GetServerAll(currentTime)
+	if err != nil {
+		fmt.Println("给全体用户发消息", err)
+
+		return
+	}
+
+	for _, server := range servers {
+		userMapByServer[server.Ip] = make([]string, 0, 4)
+		if IsLocal(server) {
+			userMapByServer[server.Ip] = append(userMapByServer[server.Ip], GetUserList()...)
+		} else {
+			list, _ := grpcclient.GetUserList(server)
+			userMapByServer[server.Ip] = append(userMapByServer[server.Ip], list...)
+		}
+	}
 	return
 }
 
@@ -84,9 +107,8 @@ func checkUserOnline(sysAccount string, appPlatform string, userId string) (onli
 }
 
 //给所有的receiverIds发送信息，如果receiverIds为一个，为一对一聊天
-func SendMessageToReceivers(message interface{}, client *Client, receiverIds []string) (sendResults bool, err error) {
+func SendMessageToReceivers(seq string, message interface{}, client *Client, receiverIds []string) (sendResults bool, err error) {
 	sendResults = true
-
 	currentTime := uint64(time.Now().Unix())
 	servers, err := cache.GetServerAll(currentTime)
 	if err != nil {
@@ -99,8 +121,11 @@ func SendMessageToReceivers(message interface{}, client *Client, receiverIds []s
 		if IsLocal(server) {
 			SendMessagesLocally(message, client, receiverIds)
 		} else {
-			//grpcclient.SendMsgAll(server, msgId, appPlatform, userId, cmd, message)
-			//todo: 处理非本地服务器的消息发送,集群使用的时候需要做RPC处理
+			msgJson, err := json.Marshal(message)
+			if err != nil {
+				//todo 处理异常
+			}
+			grpcclient.SendMsg(server, seq, client.SysAccount, client.AppPlatform, receiverIds, msgJson)
 		}
 	}
 
@@ -123,34 +148,34 @@ func SendMessagesLocally(msgData interface{}, client *Client, receiverIds []stri
 }
 
 // 给用户发送消息
-func SendUserMessage(sysAccount string, appPlatform string, userId string, msgId, message string) (sendResults bool, err error) {
-
-	data := models.GetTextMsgData(userId, msgId, message)
-
-	// TODO::需要判断不在本机的情况
-	sendResults, err = SendUserMessageLocal(sysAccount, appPlatform, userId, data)
-	if err != nil {
-		fmt.Println("给用户发送消息", appPlatform, userId, err)
-	}
-
-	return
-}
+//func SendUserMessage(sysAccount string, appPlatform string, userId string, msgId, message string) (sendResults bool, err error) {
+//
+//	data := models.GetTextMsgData(userId, msgId, message)
+//
+//	// TODO::需要判断不在本机的情况
+//	sendResults, err = SendUserMessageLocal(sysAccount, appPlatform, userId, data)
+//	if err != nil {
+//		fmt.Println("给用户发送消息", appPlatform, userId, err)
+//	}
+//
+//	return
+//}
 
 // 给本机用户发送消息
-func SendUserMessageLocal(sysAccount string, appPlatform string, userId string, data string) (sendResults bool, err error) {
+func SendUserMessageLocal(sysAccount string, appPlatform string, userIds []string, data []byte) {
 
-	client := GetUserClient(sysAccount, appPlatform, userId)
-	if client == nil {
-		err = errors.New("用户不在线")
-		//TODO 用户不在线存进MongoDB数据库
-		return
+	msg := &models.Msg{}
+	json.Unmarshal(data, msg)
+
+	for _, userId := range userIds {
+
+		client := GetUserClient(sysAccount, appPlatform, userId)
+		if client != nil {
+			fmt.Println("给对应的用户发送信息")
+			// 发送消息
+			client.SendMsg(data)
+		}
 	}
-	fmt.Println("给对应的用户发送信息")
-	// 发送消息
-	client.SendMsg([]byte(data))
-	sendResults = true
-
-	return
 }
 
 // 给全体用户发消息

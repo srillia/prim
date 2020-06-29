@@ -131,3 +131,15 @@ func TestNum(t *testing.T) {
 	fmt.Printf("%v\n", time3)
 
 }
+
+func TestAddMap(t *testing.T) {
+	userList := make(map[string][]string)
+	userList["192.168.10.22"] = make([]string, 0, 4)
+
+	list := make([]string, 2, 4)
+	list = append(list, "1", "2")
+	userList["192.168.10.22"] = append(userList["192.168.10.22"], list...)
+
+	fmt.Println(userList, list)
+
+}

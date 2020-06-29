@@ -36,7 +36,7 @@ func main() {
 	routers.WebsocketInit()
 
 	// 定时任务
-	task.Init()
+	task.CleanInit()
 
 	// 服务注册
 	task.ServerInit()
