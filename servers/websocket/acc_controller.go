@@ -21,6 +21,14 @@ import (
 )
 
 // ping
+func ExitController(client *Client, seq string, message []byte) (code uint32, msg string, data interface{}) {
+
+	//todo 清连接缓存
+
+	return
+}
+
+// ping
 func PingController(client *Client, seq string, message []byte) (code uint32, msg string, data interface{}) {
 
 	code = common.OK

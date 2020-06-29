@@ -14,6 +14,7 @@ import (
 // Websocket 路由
 func WebsocketInit() {
 	websocket.Register("heartbeat", websocket.HeartbeatController)
+	websocket.Register("exit", websocket.ExitController)
 	websocket.Register("ping", websocket.PingController)
 	websocket.Register("msg", websocket.MsgController)
 }
