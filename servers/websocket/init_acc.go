@@ -76,8 +76,7 @@ func StartWebSocket() {
 
 	// 添加处理程序
 	go clientManager.start()
-	fmt.Println("WebSocket 启动程序成功", serverIp, serverPort)
-
+	fmt.Println("WebSocket 启动程序成功", serverIp, webSocketPort)
 	http.ListenAndServe(":"+webSocketPort, nil)
 }
 

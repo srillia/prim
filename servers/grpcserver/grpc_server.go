@@ -16,6 +16,7 @@ import (
 	"log"
 	"net"
 	"prim/common"
+	"prim/helper"
 	"prim/models"
 	"prim/protobuf"
 	"prim/servers/websocket"
@@ -127,15 +128,15 @@ func (s *server) GetUserList(c context.Context, req *protobuf.GetUserListReq) (r
 func Init() {
 
 	rpcPort := viper.GetString("app.rpcPort")
-	fmt.Println("rpc server 启动", rpcPort)
-
 	lis, err := net.Listen("tcp", ":"+rpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	protobuf.RegisterAccServerServer(s, &server{})
+	fmt.Println("Grpc Server 启动成功", helper.GetServerIp(), rpcPort)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }

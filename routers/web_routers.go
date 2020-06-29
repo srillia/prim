@@ -8,14 +8,23 @@
 package routers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	"net/http"
 	"prim/controllers/home"
 	"prim/controllers/sysclient"
 	"prim/controllers/systems"
 	"prim/controllers/user"
+	"prim/helper"
 )
 
-func Init(router *gin.Engine) {
+var (
+	router *gin.Engine
+)
+
+func InitWebRouters() {
+	router = gin.Default()
 	router.LoadHTMLGlob("views/**/*")
 
 	//router.LoadHTMLFiles("views/**/*")
@@ -52,4 +61,11 @@ func Init(router *gin.Engine) {
 	}
 
 	// router.POST("/user/online", user.Online)
+}
+
+func InitHttpServer() {
+	httpPort := viper.GetString("app.httpPort")
+	fmt.Println("Http Server 启动成功", helper.GetServerIp(), httpPort)
+	http.ListenAndServe(":"+httpPort, router)
+
 }

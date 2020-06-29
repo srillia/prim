@@ -24,10 +24,9 @@ func NewClient() {
 	url := "mongodb://" + username + ":" + password + "@" + addr + "/" + db
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	fmt.Println(url)
+	fmt.Println("初始化mongoDb", url)
 	mongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI(url))
 	client = mongoClient
-	fmt.Println(client == nil)
 	if err = client.Ping(ctx, readpref.Primary()); err != nil {
 		panic(fmt.Errorf("Fatal error mongolib connect: %s \n", err))
 	}

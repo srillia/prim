@@ -9,9 +9,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"net/http"
 	"os/exec"
 	"prim/initialize"
 	"prim/routers"
@@ -30,26 +28,23 @@ func main() {
 
 	initialize.InitMongo()
 
-	router := gin.Default()
-	// 初始化路由
-	routers.Init(router)
+	//初始化websocket路由
 	routers.WebsocketInit()
+	//初始化http路由，并启动http服务器
+	routers.InitWebRouters()
 
-	// 定时任务
-	task.CleanInit()
-
-	// 服务注册
-	task.ServerInit()
 	//go 关键字类似创建一个新的线程去执行其他内容，并行处理
 	go websocket.StartWebSocket()
 	// grpc
 	go grpcserver.Init()
+	// 定时任务
+	go task.Init()
+
 	//这个初始化之后，可以不调用
-	go open()
+	//go open()
 
-	httpPort := viper.GetString("app.httpPort")
-	http.ListenAndServe(":"+httpPort, router)
-
+	//启动http服务器，阻塞线程
+	routers.InitHttpServer()
 }
 
 func open() {

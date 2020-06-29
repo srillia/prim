@@ -15,8 +15,8 @@ import (
 	"time"
 )
 
-func ServerInit() {
-	Timer(2*time.Second, 60*time.Second, server, "", serverDefer, "")
+func GrpcServerRegisterInit() {
+	Timer(5*time.Millisecond, 60*time.Second, server, "", serverDefer, "")
 }
 
 // 服务注册

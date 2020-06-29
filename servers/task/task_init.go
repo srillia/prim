@@ -44,3 +44,10 @@ func Timer(delay, tick time.Duration, fun TimerFunc, param interface{}, funcDefe
 		}
 	}()
 }
+
+func Init() {
+	//定时清理超时连接
+	ConnCleanInit()
+	// grpc服务注册
+	GrpcServerRegisterInit()
+}
