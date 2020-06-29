@@ -25,6 +25,7 @@ func Init(router *gin.Engine) {
 	{
 		userRouter.GET("/list", user.List)
 		userRouter.GET("/online", user.Online)
+		userRouter.GET("/listUserMaps", user.ListUserMap)
 		//userRouter.POST("/sendMessage", user.SendMessage)
 		//userRouter.POST("/sendMessageAll", user.SendMessageAll)
 		//userRouter.GET("/sendMessageTest", user.SendMessageTest)
