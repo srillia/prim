@@ -89,6 +89,12 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if !InAppPlatforms(appPlatform) {
+		fmt.Println("用户登录 不支持的平台", appPlatform)
+		//todo 不支持客户端逻辑处理
+		return
+	}
+
 	// 升级协议
 	conn, err := (&websocket.Upgrader{CheckOrigin: func(r *http.Request) bool {
 		fmt.Println("升级协议", "ua:", r.Header["User-Agent"], "referer:", r.Header["Referer"])
@@ -118,12 +124,6 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 }
 
 func saveUserAndClient(client *Client, currentTime uint64) {
-
-	if !InAppPlatforms(client.AppPlatform) {
-		fmt.Println("用户登录 不支持的平台", client.AppPlatform)
-		//todo 不支持客户端逻辑处理
-		return
-	}
 
 	// 存储用户登录数据
 	userOnline := models.UserLogin(serverIp, serverPort, client.AppPlatform, client.SysAccount, client.UserId, client.Addr, currentTime)

@@ -318,8 +318,10 @@ func (manager *ClientManager) start() {
 		//	manager.EventLogin(login)
 
 		case conn := <-manager.Unregister:
+			//todo 用户离开通知处理
+			println(conn)
 			// 断开连接事件
-			manager.EventUnregister(conn)
+			//manager.EventUnregister(conn)
 
 		case message := <-manager.Broadcast:
 			// 广播事件
