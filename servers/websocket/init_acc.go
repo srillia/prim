@@ -67,10 +67,10 @@ func StartWebSocket() {
 
 	serverIp = helper.GetServerIp()
 
-	webSocketPort := viper.GetString("app.webSocketPort")
-	//rpcPort := viper.GetString("app.rpcPort")
+	rpcPort := viper.GetString("app.rpcPort")
+	serverPort = rpcPort
 
-	serverPort = webSocketPort
+	webSocketPort := viper.GetString("app.webSocketPort")
 
 	http.HandleFunc("/acc", wsPage)
 
