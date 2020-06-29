@@ -134,7 +134,7 @@ func GetUserList(server *models.Server) (userIds []string, err error) {
 		return
 	}
 
-	userIds = rsp.GetUserId()
+	userIds = rsp.GetUserIds()
 	fmt.Println("获取用户列表 成功:", userIds)
 
 	return
