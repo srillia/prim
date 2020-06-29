@@ -101,6 +101,7 @@ func GetServerAll(currentTime uint64) (servers []*models.Server, err error) {
 
 		// 超时
 		if valueUint64+serversHashTimeout <= currentTime {
+			//todo 超时就删除redis缓存
 			continue
 		}
 
