@@ -138,25 +138,25 @@ func SendUserMessageLocal(sysAccount string, appPlatform string, userIds []strin
 }
 
 // 给全体用户发消息
-func SendUserMessageAll(sysAccount string, appPlatform string, userId string, msgId, action, message string) (sendResults bool, err error) {
-	sendResults = true
-
-	currentTime := uint64(time.Now().Unix())
-	servers, err := cache.GetServerAll(currentTime)
-	if err != nil {
-		fmt.Println("给全体用户发消息", err)
-
-		return
-	}
-
-	for _, server := range servers {
-		if IsLocal(server) {
-			data := models.GetMsgData(userId, msgId, action, message)
-			AllSendMessages(sysAccount, appPlatform, userId, data)
-		} else {
-			//grpcclient.SendMsgAll(server, msgId, appPlatform, userId, action, message)
-		}
-	}
-
-	return
-}
+//func SendUserMessageAll(sysAccount string, appPlatform string, userId string, msgId, action, message string) (sendResults bool, err error) {
+//	sendResults = true
+//
+//	currentTime := uint64(time.Now().Unix())
+//	servers, err := cache.GetServerAll(currentTime)
+//	if err != nil {
+//		fmt.Println("给全体用户发消息", err)
+//
+//		return
+//	}
+//
+//	for _, server := range servers {
+//		if IsLocal(server) {
+//			data := models.GetMsgData(userId, msgId, action, message)
+//			AllSendMessages(sysAccount, appPlatform, userId, data)
+//		} else {
+//			//grpcclient.SendMsgAll(server, msgId, appPlatform, userId, action, message)
+//		}
+//	}
+//
+//	return
+//}

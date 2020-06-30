@@ -9,9 +9,7 @@ package websocket
 
 import (
 	"fmt"
-	"prim/helper"
 	"prim/lib/cache"
-	"prim/models"
 	"sync"
 	"time"
 )
@@ -299,8 +297,8 @@ func (manager *ClientManager) EventUnregister(client *Client) {
 	fmt.Println("EventUnregister 用户断开连接", client.Addr, client.AppPlatform, client.UserId)
 
 	if client.UserId != "" {
-		orderId := helper.GetOrderIdTime()
-		SendUserMessageAll(client.SysAccount, client.AppPlatform, client.UserId, orderId, models.MessageActionExit, "用户已经离开~")
+		//orderId := helper.GetOrderIdTime()
+		//SendUserMessageAll(client.SysAccount, client.AppPlatform, client.UserId, orderId, models.MessageActionExit, "用户已经离开~")
 	}
 }
 
