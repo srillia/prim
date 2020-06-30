@@ -33,8 +33,9 @@ func server(param interface{}) (result bool) {
 	currentTime := uint64(time.Now().Unix())
 	fmt.Println("定时任务，服务注册", param, server, currentTime)
 
-	cache.SetServerInfo(server, currentTime)
-
+	if server.Ip != "" && server.Port != "" {
+		cache.SetServerInfo(server, currentTime)
+	}
 	return
 }
 
