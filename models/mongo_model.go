@@ -23,10 +23,10 @@ type PrimMessage struct {
 	SysAccount  string             `bson:"sysAccount,omitempty"`
 	Time        int64              `json:"time,omitempty"`
 	DateTime    string             `json:"dateTime,omitempty"`
-	SenderId    string             `bson:"roomId,omitempty"`
+	SenderId    string             `bson:"senderId,omitempty"`
 	ReceiverId  string             `bson:"receiverId,omitempty"`
 	Message     string             `bson:"message,omitempty"`
-	RoomId      primitive.ObjectID `bson:"roomId,omitempty"`
+	RoomId      string             `bson:"roomId,omitempty"`
 	MsgType     string             `bson:"msgType,omitempty"`
 	MsgContType string             `bson:"msgContType,omitempty"`
 	State       string             `bson:"state,omitempty"`

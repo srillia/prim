@@ -8,6 +8,7 @@
 package websocket
 
 import (
+	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -45,11 +46,17 @@ func MsgController(client *Client, acc *models.Acc) *models.Acc {
 }
 
 func disposeMsgAcc(client *Client, acc *models.Acc) *models.Msg {
-	msg := acc.Msg.(models.Msg)
+	msg := &models.Msg{}
+	convertType(acc.Msg, msg)
 	msg.SenderId = client.UserId
 	msg.DateTime = common.TimestampToDateString(msg.Time)
 	acc.Msg = msg
-	return &msg
+	return msg
+}
+
+func convertType(data interface{}, ret interface{}) {
+	msgData, _ := json.Marshal(data)
+	json.Unmarshal(msgData, ret)
 }
 
 func addMessageInMongo(client *Client, msg *models.Msg) {
@@ -83,7 +90,7 @@ func addRoomInfoWhenNoRoomIdInMsg(client *Client, msgData *models.Msg) {
 	} else { //不存在room 添加并赋值
 		room := models.PrimRoom{UserList: userList}
 		id, _ := mongolib.InsertOne(mongolib.GetConn("prim_room"), room)
-		msgData.RoomId = id.(primitive.ObjectID).String()
+		msgData.RoomId = id.(primitive.ObjectID).Hex()
 	}
 }
 

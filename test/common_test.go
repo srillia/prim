@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"prim/common"
 	"prim/initialize"
+	"prim/lib/mongolib"
 	"prim/models"
 	"strconv"
 	"strings"
@@ -20,6 +21,7 @@ func TestMain(m *testing.M) {
 	index := strings.LastIndex(dir, "\\")
 	initialize.SetConfigPath(dir[:index])
 	initialize.InitConfig()
+	mongolib.NewClient()
 	m.Run()
 }
 
@@ -142,4 +144,14 @@ func TestAddMap(t *testing.T) {
 
 	fmt.Println(userList, list)
 
+}
+
+func TestConvertType(t *testing.T) {
+	json := "{\"message\":\"xxxx\"}"
+	convertType(json, &models.Msg{})
+}
+
+func convertType(data interface{}, ret interface{}) {
+	msgData, _ := json.Marshal(data)
+	json.Unmarshal(msgData, ret)
 }

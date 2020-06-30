@@ -40,6 +40,9 @@ func GetConn(coll string) *mongo.Collection {
 func InsertOne(coll *mongo.Collection, m interface{}) (interface{}, error) {
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	res, err := coll.InsertOne(ctx, m)
+	if err != nil {
+		fmt.Println("mongodb 添加数据异常", err)
+	}
 	id := res.InsertedID
 	return id, err
 }

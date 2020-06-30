@@ -12,7 +12,7 @@ import (
 func TestInsert(t *testing.T) {
 
 	t.Log("hello world")
-	sysClient := models.PrimSysClient{Account: "1353358523733", Password: "123456", State: 1}
+	sysClient := &models.PrimMessage{SysAccount: "1353358523733"}
 
 	mongolib.InsertOne(mongolib.GetConn("prim_message"), sysClient)
 }
