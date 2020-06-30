@@ -56,5 +56,5 @@ func PassCheckToken(token string) (isPass bool, sysAccount string, appPlatform s
 	if err == nil {
 		return true, arr[0], arr[1], arr[2]
 	}
-	return false, arr[0], arr[1], arr[2]
+	return false, "", "", ""
 }
