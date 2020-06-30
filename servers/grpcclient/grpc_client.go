@@ -127,11 +127,11 @@ func GetUserList(server *models.Server) (userIds []string, err error) {
 		return
 	}
 
-	if rsp.GetRetCode() != common.OK {
-		fmt.Println("获取用户列表 返回码错误:", rsp.String())
-
-		return
-	}
+	//if rsp.GetRetCode() != common.OK {
+	//	fmt.Println("获取用户列表 返回码错误:", rsp.String())
+	//
+	//	return
+	//}
 
 	userIds = rsp.GetUserIds()
 	fmt.Println("获取用户列表 成功:", userIds)
