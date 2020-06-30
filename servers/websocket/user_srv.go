@@ -106,47 +106,6 @@ func checkUserOnline(sysAccount string, appPlatform string, userId string) (onli
 	return
 }
 
-//给所有的receiverIds发送信息，如果receiverIds为一个，为一对一聊天
-func SendMessageToReceivers(seq string, message interface{}, client *Client, receiverIds []string) (sendResults bool, err error) {
-	sendResults = true
-	currentTime := uint64(time.Now().Unix())
-	servers, err := cache.GetServerAll(currentTime)
-	if err != nil {
-		fmt.Println("所有服务器正常", err)
-
-		return
-	}
-
-	for _, server := range servers {
-		if IsLocal(server) {
-			SendMessagesLocally(message, client, receiverIds)
-		} else {
-			msgJson, err := json.Marshal(message)
-			if err != nil {
-				//todo 处理异常
-			}
-			grpcclient.SendMsg(server, seq, client.SysAccount, client.AppPlatform, receiverIds, msgJson)
-		}
-	}
-
-	return
-}
-
-//向所有的receiverIds发送信息
-func SendMessagesLocally(msgData interface{}, client *Client, receiverIds []string) {
-
-	//获取redis 保存的userKey的格式
-	userKeys := GetUserKeysNeedMsging(client.SysAccount, client.AppPlatform, client.UserId, receiverIds)
-	for _, userKey := range userKeys {
-		if client, ok := clientManager.Users[userKey]; ok {
-			message, _ := json.Marshal(msgData)
-			client.SendMsg(message)
-		} else {
-			// todo: 如果对方不在线，将离线数据存到mongo中,临时保存
-		}
-	}
-}
-
 // 给用户发送消息
 //func SendUserMessage(sysAccount string, appPlatform string, userId string, msgId, message string) (sendResults bool, err error) {
 //
@@ -195,7 +154,7 @@ func SendUserMessageAll(sysAccount string, appPlatform string, userId string, ms
 			data := models.GetMsgData(userId, msgId, action, message)
 			AllSendMessages(sysAccount, appPlatform, userId, data)
 		} else {
-			grpcclient.SendMsgAll(server, msgId, appPlatform, userId, action, message)
+			//grpcclient.SendMsgAll(server, msgId, appPlatform, userId, action, message)
 		}
 	}
 

@@ -11,24 +11,17 @@ type Acc struct {
 	Msg interface{} `json:"msg,omitempty"` // 消息体
 }
 
-//1对1聊天
-type Msg struct {
-	SysAccount  string `json:"sysAccount,omitempty"`
-	SenderId    string `json:"senderId,omitempty"`
-	ReceiverId  string `json:"receiverId,omitempty"`
-	Time        int64  `json:"time,omitempty"`
-	DateTime    string `json:"dateTime,omitempty"`
-	Message     string `json:"message,omitempty"`
-	RoomId      string `json:"roomId,omitempty"`
-	MsgType     string `json:"msgType,omitempty"`     // info 信息，sysMsg系统消息，robot机器人
-	MsgContType string `json:"msgContType,omitempty"` // text文本，emoj 表情,file文件，picture 图片，audio 语音，video视频
+func (acc *Acc) OkAcc(msg interface{}) *Acc {
+	//需要根据acc获取seq
+	return &Acc{acc.Seq, "ok", msg}
 }
 
-type GroupMsg struct {
-	//todo
+func (acc *Acc) AckAcc(msg interface{}) *Acc {
+	//需要根据acc获取seq
+	return &Acc{acc.Seq, "ack", msg}
 }
 
-// 心跳请求数据
-type HeartBeat struct {
-	UserId string `json:"userId,omitempty"`
+func (acc *Acc) HeartBeatAcc(msg interface{}) *Acc {
+	//需要根据acc获取seq
+	return &Acc{acc.Seq, "heartbeat", msg}
 }

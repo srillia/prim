@@ -10,14 +10,11 @@ package grpcserver
 import (
 	"context"
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"prim/common"
 	"prim/helper"
-	"prim/models"
 	"prim/protobuf"
 	"prim/servers/websocket"
 )
@@ -25,27 +22,27 @@ import (
 type server struct {
 }
 
-func setErr(rsp proto.Message, code uint32, message string) {
-
-	message = common.GetErrorMessage(code, message)
-	switch v := rsp.(type) {
-	case *protobuf.QueryUsersOnlineRsp:
-		v.RetCode = code
-		v.ErrMsg = message
-	case *protobuf.SendMsgRsp:
-		v.RetCode = code
-		v.ErrMsg = message
-	case *protobuf.SendMsgAllRsp:
-		v.RetCode = code
-		v.ErrMsg = message
-	case *protobuf.GetUserListRsp:
-		v.RetCode = code
-		v.ErrMsg = message
-	default:
-
-	}
-
-}
+//func setErr(rsp proto.Message, code uint32, message string) {
+//
+//	message = common.GetErrorMessage(code, message)
+//	switch v := rsp.(type) {
+//	case *protobuf.QueryUsersOnlineRsp:
+//		v.RetCode = code
+//		v.ErrMsg = message
+//	case *protobuf.SendMsgRsp:
+//		v.RetCode = code
+//		v.ErrMsg = message
+//	case *protobuf.SendMsgAllRsp:
+//		v.RetCode = code
+//		v.ErrMsg = message
+//	case *protobuf.GetUserListRsp:
+//		v.RetCode = code
+//		v.ErrMsg = message
+//	default:
+//
+//	}
+//
+//}
 
 // 查询用户是否在线
 func (s *server) QueryUsersOnline(c context.Context, req *protobuf.QueryUsersOnlineReq) (rsp *protobuf.QueryUsersOnlineRsp, err error) {
@@ -56,7 +53,7 @@ func (s *server) QueryUsersOnline(c context.Context, req *protobuf.QueryUsersOnl
 
 	online := websocket.CheckUserOnline(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId())
 
-	setErr(req, common.OK, "")
+	//setErr(req, common.OK, "")
 	rsp.Online = online
 
 	return rsp, nil
@@ -67,43 +64,26 @@ func (s *server) SendMsg(c context.Context, req *protobuf.SendMsgReq) (rsp *prot
 
 	fmt.Println("grpc_request 给本机用户发消息", req.String())
 
-	websocket.SendUserMessageLocal(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserIds(), req.Msg)
-	//if err != nil {
-	//	fmt.Println("系统错误", err)
-	//	setErr(rsp, common.ServerError, "")
-	//
-	//	return rsp, nil
-	//}
-	//
-	//if !sendResults {
-	//	fmt.Println("发送失败", err)
-	//	setErr(rsp, common.OperationFailure, "")
-	//
-	//	return rsp, nil
-	//}
-	//
-	//setErr(rsp, common.OK, "")
-
-	//fmt.Println("grpc_response 给本机用户发消息", rsp.String())
+	websocket.SendUserMessageLocal(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserIds(), req.Acc)
 	return
 }
 
-// 给本机全体用户发消息
-func (s *server) SendMsgAll(c context.Context, req *protobuf.SendMsgAllReq) (rsp *protobuf.SendMsgAllRsp, err error) {
-
-	fmt.Println("grpc_request 给本机全体用户发消息", req.String())
-
-	rsp = &protobuf.SendMsgAllRsp{}
-
-	data := models.GetMsgData(req.GetUserId(), req.GetSeq(), req.GetAction(), req.GetMsg())
-	websocket.AllSendMessages(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId(), data)
-
-	setErr(rsp, common.OK, "")
-
-	fmt.Println("grpc_response 给本机全体用户发消息:", rsp.String())
-
-	return
-}
+////给本机全体用户发消息
+//func (s *server) SendMsgAll(c context.Context, req *protobuf.SendMsgAllReq) (rsp *protobuf.SendMsgAllRsp, err error) {
+//
+//	fmt.Println("grpc_request 给本机全体用户发消息", req.String())
+//
+//	rsp = &protobuf.SendMsgAllRsp{}
+//
+//	data := models.GetMsgData(req.GetUserId(), req.GetSeq(), req.GetAction(), req.GetMsg())
+//	websocket.AllSendMessages(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId(), data)
+//
+//	setErr(rsp, common.OK, "")
+//
+//	fmt.Println("grpc_response 给本机全体用户发消息:", rsp.String())
+//
+//	return
+//}
 
 // 获取本机用户列表
 func (s *server) GetUserList(c context.Context, req *protobuf.GetUserListReq) (rsp *protobuf.GetUserListRsp, err error) {
@@ -115,7 +95,7 @@ func (s *server) GetUserList(c context.Context, req *protobuf.GetUserListReq) (r
 	// 本机
 	userList := websocket.GetUserList()
 
-	setErr(rsp, common.OK, "")
+	//setErr(rsp, common.OK, "")
 	rsp.UserIds = userList
 
 	fmt.Println("grpc_response 获取本机用户列表:", rsp.String())

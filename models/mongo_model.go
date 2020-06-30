@@ -13,24 +13,6 @@ type PrimSysClient struct {
 	AuthCode string             `bson:"authCode,omitempty"`
 }
 
-//todo 下载注释代码将作废
-//type PrimUser struct {
-//	Id              primitive.ObjectID `bson:"_id,omitempty"`
-//	UserId          string
-//	PrimSysClientId primitive.ObjectID
-//	Account         string
-//	Nickname        string
-//	Signature       string
-//	Sex             int8
-//	Birthday        time.Time
-//	Tel             string
-//	Email           string
-//	Intro           string
-//	Avatar          string
-//	Age             int8
-//	State           byte
-//}
-
 type PrimRoom struct {
 	Id       primitive.ObjectID `bson:"_id,omitempty"`
 	UserList [2]string          `bson:"userList,omitempty"`
@@ -38,10 +20,13 @@ type PrimRoom struct {
 
 type PrimMessage struct {
 	Id          primitive.ObjectID `bson:"_id,omitempty"`
-	Message     string             `bson:"message,omitempty"`
-	RoomId      primitive.ObjectID `bson:"roomId,omitempty"`
+	SysAccount  string             `bson:"sysAccount,omitempty"`
+	Time        int64              `json:"time,omitempty"`
+	DateTime    string             `json:"dateTime,omitempty"`
 	SenderId    string             `bson:"roomId,omitempty"`
 	ReceiverId  string             `bson:"receiverId,omitempty"`
+	Message     string             `bson:"message,omitempty"`
+	RoomId      primitive.ObjectID `bson:"roomId,omitempty"`
 	MsgType     string             `bson:"msgType,omitempty"`
 	MsgContType string             `bson:"msgContType,omitempty"`
 	State       string             `bson:"state,omitempty"`

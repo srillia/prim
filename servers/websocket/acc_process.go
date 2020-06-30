@@ -10,12 +10,11 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"prim/common"
 	"prim/models"
 	"sync"
 )
 
-type DisposeFunc func(client *Client, seq string, message []byte) (code uint32, msg string, data interface{})
+type DisposeFunc func(client *Client, acc *models.Acc) *models.Acc
 
 var (
 	handlers        = make(map[string]DisposeFunc)
@@ -61,48 +60,38 @@ func ProcessData(client *Client, message []byte) {
 		return
 	}
 
-	requestData, err := json.Marshal(acc.Msg)
-	if err != nil {
-		fmt.Println("处理数据 json Marshal", err)
-		client.SendMsg([]byte("处理数据失败"))
-
-		return
-	}
-
-	seq := acc.Seq
-	action := acc.Action
+	//requestData, err := json.Marshal(acc.Msg)
+	//if err != nil {
+	//	fmt.Println("处理数据 json Marshal", err)
+	//	client.SendMsg([]byte("处理数据失败"))
+	//
+	//	return
+	//}
 
 	var (
-		code uint32
-		msg  string
-		data interface{}
+		ret *models.Acc
 	)
 
 	// request
-	fmt.Println("acc_request", action, client.Addr)
-
+	fmt.Println("acc_request", acc.Action, client.Addr)
 	// 采用 map 注册的方式
-	if handle, ok := getHandlers(action); ok {
-		code, msg, data = handle(client, seq, requestData)
+	if handle, ok := getHandlers(acc.Action); ok {
+		ret = handle(client, acc)
 	} else {
-		code = common.RoutingNotExist
-		fmt.Println("处理数据 路由不存在", client.Addr, "action", action)
+		//todo 添加 ex action
+		fmt.Println("处理数据 路由不存在", client.Addr, "action", acc.Action)
 	}
 
-	msg = common.GetErrorMessage(code, msg)
-
-	responseHead := models.NewResponseHead(seq, action, code, msg, data)
-
-	headByte, err := json.Marshal(responseHead)
+	retByte, err := json.Marshal(ret)
 	if err != nil {
-		fmt.Println("处理数据 json Marshal", err)
+		fmt.Println("处理数据 json ret", err)
 
 		return
 	}
 
-	client.SendMsg(headByte)
+	client.SendMsg(retByte)
 
-	fmt.Println("acc_response send", client.Addr, client.AppPlatform, client.UserId, "action", action, "code", code)
+	fmt.Println("acc_response send", client.Addr, client.AppPlatform, client.UserId, "action", ret.Action)
 
 	return
 }

@@ -15,9 +15,6 @@ service AccServer {
     // 发送消息
     rpc SendMsg (SendMsgReq) returns (SendMsgRsp) {
     }
-    // 发送消息
-    rpc SendMsgAll (SendMsgAllReq) returns (SendMsgAllRsp) {
-    }
     // 获取用户列表
     rpc GetUserList (GetUserListReq) returns (GetUserListRsp) {
     }
@@ -38,11 +35,10 @@ message QueryUsersOnlineRsp {
 
 // 发送消息
 message SendMsgReq {
-    string seq = 1; // 序列号
-    string sysAccount = 2; // 用户ID
-    string appPlatform = 3; // 用户ID
-    repeated string userIds = 4;
-    bytes msg = 5; // 用户ID
+    string sysAccount = 1; // 用户ID
+    string appPlatform = 2; // 用户ID
+    repeated string userIds = 3;
+    bytes acc = 4; // 用户ID
 }
 
 message SendMsgRsp {
@@ -51,22 +47,18 @@ message SendMsgRsp {
     string sendMsgId = 3;
 }
 
-// 发送消息
-message SendMsgAllReq {
-    string seq = 1; // 序列号
-    string sysAccount = 2; // 用户ID
-    string appPlatform = 3; // 用户ID
-    string userId = 4; // 用户ID
-    string action = 5; // action 动作: msg/enter/exit
-    string type = 6; // type 消息类型，默认是 text
-    string msg = 7; // msg
-}
-
-message SendMsgAllRsp {
-    uint32 retCode = 1;
-    string errMsg = 2;
-    string sendMsgId = 3;
-}
+//// 发送消息
+//message SendMsgAllReq {
+//    string sysAccount = 1; // 用户ID
+//    string appPlatform = 2; // 用户ID
+//    string acc = 3; // msg
+//}
+//
+//message SendMsgAllRsp {
+//    uint32 retCode = 1;
+//    string errMsg = 2;
+//    string sendMsgId = 3;
+//}
 
 // 获取用户列表
 message GetUserListReq {

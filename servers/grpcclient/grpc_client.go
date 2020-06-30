@@ -18,7 +18,7 @@ import (
 )
 
 // rpc 发送一对一信息
-func SendMsg(server *models.Server, seq string, sysAccount string, appPlatform string, receiverIds []string, message []byte) (sendMsgId string, err error) {
+func SendMsg(server *models.Server, sysAccount string, appPlatform string, receiverIds []string, acc []byte) (sendMsgId string, err error) {
 	fmt.Println("查看是否调用了grpc_client.go。SendMsgAll-------------")
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(server.String(), grpc.WithInsecure())
@@ -34,11 +34,10 @@ func SendMsg(server *models.Server, seq string, sysAccount string, appPlatform s
 	defer cancel()
 
 	req := protobuf.SendMsgReq{
-		Seq:         seq,
 		SysAccount:  sysAccount,
 		AppPlatform: appPlatform,
 		UserIds:     receiverIds,
-		Msg:         message,
+		Acc:         acc,
 	}
 	rsp, err := c.SendMsg(ctx, &req)
 	if err != nil {
@@ -62,46 +61,46 @@ func SendMsg(server *models.Server, seq string, sysAccount string, appPlatform s
 // rpc client
 // 给全体用户发送消息
 // link::https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_client/main.go
-func SendMsgAll(server *models.Server, seq string, appPlatform string, userId string, action string, message string) (sendMsgId string, err error) {
-	fmt.Println("查看是否调用了grpc_client.go。SendMsgAll-------------")
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(server.String(), grpc.WithInsecure())
-	if err != nil {
-		fmt.Println("连接失败", server.String())
-
-		return
-	}
-	defer conn.Close()
-
-	c := protobuf.NewAccServerClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	req := protobuf.SendMsgAllReq{
-		Seq:         seq,
-		AppPlatform: appPlatform,
-		UserId:      userId,
-		Action:      action,
-		Msg:         message,
-	}
-	rsp, err := c.SendMsgAll(ctx, &req)
-	if err != nil {
-		fmt.Println("给全体用户发送消息", err)
-
-		return
-	}
-
-	if rsp.GetRetCode() != common.OK {
-		fmt.Println("给全体用户发送消息", rsp.String())
-
-		return
-	}
-
-	sendMsgId = rsp.GetSendMsgId()
-	fmt.Println("给全体用户发送消息 成功:", sendMsgId)
-
-	return
-}
+//func SendMsgAll(server *models.Server, seq string, appPlatform string, userId string, action string, message string) (sendMsgId string, err error) {
+//	fmt.Println("查看是否调用了grpc_client.go。SendMsgAll-------------")
+//	// Set up a connection to the server.
+//	conn, err := grpc.Dial(server.String(), grpc.WithInsecure())
+//	if err != nil {
+//		fmt.Println("连接失败", server.String())
+//
+//		return
+//	}
+//	defer conn.Close()
+//
+//	c := protobuf.NewAccServerClient(conn)
+//	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+//	defer cancel()
+//
+//	req := protobuf.SendMsgAllReq{
+//		Seq:         seq,
+//		AppPlatform: appPlatform,
+//		UserId:      userId,
+//		Action:      action,
+//		Msg:         message,
+//	}
+//	rsp, err := c.SendMsgAll(ctx, &req)
+//	if err != nil {
+//		fmt.Println("给全体用户发送消息", err)
+//
+//		return
+//	}
+//
+//	if rsp.GetRetCode() != common.OK {
+//		fmt.Println("给全体用户发送消息", rsp.String())
+//
+//		return
+//	}
+//
+//	sendMsgId = rsp.GetSendMsgId()
+//	fmt.Println("给全体用户发送消息 成功:", sendMsgId)
+//
+//	return
+//}
 
 // 获取用户列表
 // link::https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_client/main.go
