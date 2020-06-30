@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis"
+	"prim/initialize"
 	"prim/lib/cache"
 	"prim/models"
 	"prim/servers/grpcclient"
@@ -33,7 +34,7 @@ func UserList() (userList []string) {
 		var (
 			list []string
 		)
-		if IsLocal(server) {
+		if initialize.IsLocal(server) {
 			list = GetUserList()
 		} else {
 			list, _ = grpcclient.GetUserList(server)
@@ -58,7 +59,7 @@ func UserListByServer() (userMapByServer map[string][]string) {
 
 	for _, server := range servers {
 		userMapByServer[server.Ip] = make([]string, 0, 4)
-		if IsLocal(server) {
+		if initialize.IsLocal(server) {
 			userMapByServer[server.Ip] = append(userMapByServer[server.Ip], GetUserList()...)
 		} else {
 			list, _ := grpcclient.GetUserList(server)

@@ -10,13 +10,12 @@ package routers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"net/http"
 	"prim/controllers/home"
 	"prim/controllers/sysclient"
 	"prim/controllers/systems"
 	"prim/controllers/user"
-	"prim/helper"
+	"prim/initialize"
 )
 
 var (
@@ -64,8 +63,7 @@ func InitWebRouters() {
 }
 
 func InitHttpServer() {
-	httpPort := viper.GetString("app.httpPort")
-	fmt.Println("Http Server 启动成功", helper.GetServerIp(), httpPort)
-	http.ListenAndServe(":"+httpPort, router)
+	fmt.Println("Http Server 启动成功", initialize.ServerIp, initialize.HttpPort)
+	http.ListenAndServe(":"+initialize.HttpPort, router)
 
 }

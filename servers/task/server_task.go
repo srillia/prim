@@ -9,8 +9,8 @@ package task
 
 import (
 	"fmt"
+	"prim/initialize"
 	"prim/lib/cache"
-	"prim/servers/websocket"
 	"runtime/debug"
 	"time"
 )
@@ -29,7 +29,7 @@ func server(param interface{}) (result bool) {
 		}
 	}()
 
-	server := websocket.GetServer()
+	server := initialize.GetServer()
 	currentTime := uint64(time.Now().Unix())
 	fmt.Println("定时任务，服务注册", param, server, currentTime)
 
@@ -49,7 +49,7 @@ func serverDefer(param interface{}) (result bool) {
 
 	fmt.Println("服务下线", param)
 
-	server := websocket.GetServer()
+	server := initialize.GetServer()
 	cache.DelServerInfo(server)
 
 	return

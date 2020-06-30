@@ -10,11 +10,10 @@ package grpcserver
 import (
 	"context"
 	"fmt"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"prim/helper"
+	"prim/initialize"
 	"prim/protobuf"
 	"prim/servers/websocket"
 )
@@ -106,15 +105,13 @@ func (s *server) GetUserList(c context.Context, req *protobuf.GetUserListReq) (r
 // rpc server
 // link::https://github.com/grpc/grpc-go/blob/master/examples/helloworld/greeter_server/main.go
 func Init() {
-
-	rpcPort := viper.GetString("app.rpcPort")
-	lis, err := net.Listen("tcp", ":"+rpcPort)
+	lis, err := net.Listen("tcp", ":"+initialize.RpcPort)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	protobuf.RegisterAccServerServer(s, &server{})
-	fmt.Println("Grpc Server 启动成功", helper.GetServerIp(), rpcPort)
+	fmt.Println("Grpc Server 启动成功", initialize.ServerIp, initialize.RpcPort)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

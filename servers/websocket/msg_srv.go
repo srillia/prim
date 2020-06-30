@@ -10,6 +10,7 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"prim/initialize"
 	"prim/lib/cache"
 	"prim/models"
 	"prim/servers/grpcclient"
@@ -28,7 +29,7 @@ func SendMessageToReceivers(client *Client, acc *models.Acc, receiverIds []strin
 	}
 
 	for _, server := range servers {
-		if IsLocal(server) {
+		if initialize.IsLocal(server) {
 			SendMessagesLocally(client, acc, receiverIds)
 		} else {
 			accJson, err := json.Marshal(acc)

@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/spf13/viper"
 	"net/http"
-	"prim/helper"
+	"prim/initialize"
 	"prim/lib/cache"
 	"prim/lib/redislib"
 	"prim/models"
@@ -22,9 +22,6 @@ import (
 var (
 	clientManager = NewClientManager()                // 管理者
 	appPlatforms  = []string{"web", "android", "ios"} // 全部的平台
-
-	serverIp   string
-	serverPort string
 )
 
 func GetAppPlatforms() []string {
@@ -33,20 +30,6 @@ func GetAppPlatforms() []string {
 
 func GetClientManager() *ClientManager {
 	return clientManager
-}
-
-func GetServer() (server *models.Server) {
-	server = models.NewServer(serverIp, serverPort)
-
-	return
-}
-
-func IsLocal(server *models.Server) (isLocal bool) {
-	if server.Ip == serverIp && server.Port == serverPort {
-		isLocal = true
-	}
-
-	return
 }
 
 func InAppPlatforms(appPlatform string) (inAppPlatform bool) {
@@ -65,18 +48,13 @@ func InAppPlatforms(appPlatform string) (inAppPlatform bool) {
 // 启动程序
 func StartWebSocket() {
 
-	serverIp = helper.GetServerIp()
-
-	rpcPort := viper.GetString("app.rpcPort")
-	serverPort = rpcPort
-
 	webSocketPort := viper.GetString("app.webSocketPort")
 
 	http.HandleFunc("/acc", wsPage)
 
 	// 添加处理程序
 	go clientManager.start()
-	fmt.Println("WebSocket 启动程序成功", serverIp, webSocketPort)
+	fmt.Println("WebSocket 启动程序成功", initialize.ServerIp, webSocketPort)
 	http.ListenAndServe(":"+webSocketPort, nil)
 }
 
@@ -126,7 +104,7 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 func saveUserAndClient(client *Client, currentTime uint64) {
 
 	// 存储用户登录数据
-	userOnline := models.UserLogin(serverIp, serverPort, client.AppPlatform, client.SysAccount, client.UserId, client.Addr, currentTime)
+	userOnline := models.UserLogin(initialize.ServerIp, initialize.AccPort, client.AppPlatform, client.SysAccount, client.UserId, client.Addr, currentTime)
 	err := cache.SetUserOnlineInfo(client.GetKey(), userOnline)
 	if err != nil {
 		fmt.Printf("保存登录用户信息成功:%v", userOnline)

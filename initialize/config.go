@@ -6,12 +6,19 @@ import (
 	"github.com/spf13/viper"
 	"io"
 	"os"
+	"prim/helper"
 	"prim/lib/mongolib"
 	"prim/lib/redislib"
+	"prim/models"
 )
 
 var (
 	configPath string
+
+	ServerIp string
+	RpcPort  string
+	AccPort  string
+	HttpPort string
 )
 
 func SetConfigPath(path string) {
@@ -55,6 +62,29 @@ func InitConfig() {
 	fmt.Println("config app:", viper.Get("app"))
 	fmt.Println("config redis:", viper.Get("redis"))
 
+	initRpcServerConfig()
+
+}
+
+func initRpcServerConfig() {
+	ServerIp = helper.GetServerIp()
+	RpcPort = viper.GetString("app.rpcPort")
+	AccPort = viper.GetString("app.webSocketPort")
+	HttpPort = viper.GetString("app.httpPort")
+}
+
+func GetServer() (server *models.Server) {
+	server = models.NewServer(ServerIp, RpcPort)
+
+	return
+}
+
+func IsLocal(server *models.Server) (isLocal bool) {
+	if server.Ip == ServerIp && server.Port == RpcPort {
+		isLocal = true
+	}
+
+	return
 }
 
 // 初始化日志
