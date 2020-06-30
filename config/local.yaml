@@ -17,6 +17,6 @@ mongo:
 redis:
   addr: "192.168.10.44:6379"
   password: ""
-  DB: 0
+  DB: 1
   poolSize: 30
   minIdleConns: 30
