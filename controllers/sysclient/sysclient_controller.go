@@ -28,7 +28,8 @@ func GetSysClient(c *gin.Context) {
 }
 
 func getSysClient(account string) (interface{}, error) {
-	sysClient, err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"), bson.M{"account": account}, models.PrimSysClient{})
+	sysClient := &models.PrimSysClient{}
+	err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"), bson.M{"account": account}, sysClient)
 	return sysClient, err
 }
 
@@ -50,9 +51,9 @@ func CreateSysClient(c *gin.Context) {
 
 func saveSysClient(phoneNum string, account string, password string) error {
 
-	//{"$or":[{"a":1}, {"b":2}]}
-	client, err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"),
-		bson.D{{"account", account}}, models.PrimSysClient{})
+	client := &models.PrimSysClient{}
+	err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"),
+		bson.D{{"account", account}}, client)
 	fmt.Printf("%v", client)
 
 	//说明已经存在客户端
@@ -94,7 +95,8 @@ func GetToken(c *gin.Context) {
 }
 
 func checkAuthCode(account string, code string) bool {
-	_, err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"), bson.D{{"account", account}, {"authCode", code}}, models.PrimSysClient{})
+	primSysClient := &models.PrimSysClient{}
+	err := mongolib.FindOne(mongolib.GetConn("prim_sys_client"), bson.D{{"account", account}, {"authCode", code}}, primSysClient)
 	//err == nil 说明存在
 	if err == nil {
 		return true

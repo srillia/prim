@@ -10,8 +10,12 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"prim/common"
 	"prim/initialize"
 	"prim/lib/cache"
+	"prim/lib/mongolib"
 	"prim/models"
 	"prim/servers/grpcclient"
 	"time"
@@ -30,7 +34,7 @@ func SendMessageToReceivers(client *Client, acc *models.Acc, receiverIds []strin
 
 	for _, server := range servers {
 		if initialize.IsLocal(server) {
-			SendMessagesLocally(client, acc, receiverIds)
+			SendMessagesByLocal(client, acc, receiverIds)
 		} else {
 			accJson, err := json.Marshal(acc)
 			if err != nil {
@@ -44,7 +48,7 @@ func SendMessageToReceivers(client *Client, acc *models.Acc, receiverIds []strin
 }
 
 //向所有的receiverIds发送信息
-func SendMessagesLocally(client *Client, acc *models.Acc, receiverIds []string) {
+func SendMessagesByLocal(client *Client, acc *models.Acc, receiverIds []string) {
 
 	//获取redis 保存的userKey的格式
 	userKeys := GetUserKeysNeedMsging(client.SysAccount, client.AppPlatform, client.UserId, receiverIds)
@@ -55,5 +59,58 @@ func SendMessagesLocally(client *Client, acc *models.Acc, receiverIds []string) 
 		} else {
 			// todo: 如果对方不在线，将离线数据存到mongo中,临时保存
 		}
+	}
+}
+
+func SaveMessageInMongo(client *Client, acc *models.Acc) (msg *models.Msg) {
+	msg = disposeMsgAcc(client, acc)
+	checkRoomInfoMongo(client, msg)
+	addMessageInMongo(client, msg)
+	return
+}
+
+func disposeMsgAcc(client *Client, acc *models.Acc) *models.Msg {
+	msg := &models.Msg{}
+	common.ConvertType(acc.Msg, msg)
+	msg.SenderId = client.UserId
+	msg.DateTime = common.TimestampToDateString(msg.Time)
+	acc.Msg = msg
+	return msg
+}
+
+func addMessageInMongo(client *Client, msg *models.Msg) {
+	primMessage := &models.PrimMessage{}
+	common.CopyProperties(msg, primMessage)
+	primMessage.SysAccount = client.SysAccount
+	mongolib.InsertOne(mongolib.GetConn("prim_message"), primMessage)
+}
+
+func checkRoomInfoMongo(client *Client, msgData *models.Msg) {
+	if msgData.RoomId == "" {
+		addRoomInfoWhenNoRoomIdInMsg(client, msgData)
+
+	} else {
+		objectId, _ := primitive.ObjectIDFromHex(msgData.RoomId)
+		primRoom := &models.PrimRoom{}
+		err := mongolib.FindOne(mongolib.GetConn("prim_room"), bson.M{"_id": objectId}, primRoom)
+		//说明不存在
+		if err != nil {
+			addRoomInfoWhenNoRoomIdInMsg(client, msgData)
+		}
+		//存在不不用处理了
+	}
+}
+
+func addRoomInfoWhenNoRoomIdInMsg(client *Client, msgData *models.Msg) {
+	userList := [2]string{client.UserId, msgData.ReceiverId}
+	primRoom := &models.PrimRoom{}
+	err := mongolib.FindOne(mongolib.GetConn("prim_room"), bson.D{{"userList", bson.D{{"$all", userList}}}}, primRoom)
+	//err == nil说明存在
+	if err == nil {
+		msgData.RoomId = primRoom.Id.Hex()
+	} else { //不存在room 添加并赋值
+		room := models.PrimRoom{UserList: userList}
+		id, _ := mongolib.InsertOne(mongolib.GetConn("prim_room"), room)
+		msgData.RoomId = id.(primitive.ObjectID).Hex()
 	}
 }

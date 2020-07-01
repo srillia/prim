@@ -19,10 +19,15 @@ func TestInsert(t *testing.T) {
 
 func TestGetOne(t *testing.T) {
 
-	t.Log("hello world")
+	//t.Log("hello world")
+	//
+	//sysUser, _ := mongolib.FindOne(mongolib.GetConn("prim_message"), bson.M{"account": "13533585237"}, models.PrimSysClient{})
+	//fmt.Printf("%v", sysUser)
+	userList := [2]string{"9532", "9531"}
+	primRoom := &models.PrimRoom{}
+	err := mongolib.FindOne(mongolib.GetConn("prim_room"), bson.D{{"userList", bson.D{{"$all", userList}}}}, primRoom)
+	fmt.Println(primRoom, err)
 
-	sysUser, _ := mongolib.FindOne(mongolib.GetConn("prim_message"), bson.M{"account": "13533585237"}, models.PrimSysClient{})
-	fmt.Printf("%v", sysUser)
 }
 
 func TestExist(t *testing.T) {
@@ -53,10 +58,10 @@ func TestPrimRoom(t *testing.T) {
 
 func TestFindPrimRoom(t *testing.T) {
 
-	arr := [2]string{"123456789"}
+	arr := [2]string{"9532", "9531"}
 	//primRoom := models.PrimRoom{UserList:arr}
 	room := &models.PrimRoom{}
-	mongolib.FindOne(mongolib.GetConn("prim_room"), bson.D{{"userlist", bson.D{{"$all", arr}}}}, room)
-	fmt.Printf("%v\n", room)
+	err := mongolib.FindOne(mongolib.GetConn("prim_room"), bson.D{{"userList", bson.D{{"$all", arr}}}}, room)
+	fmt.Println(room.Id, err)
 
 }

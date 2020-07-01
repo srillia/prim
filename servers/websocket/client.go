@@ -77,11 +77,6 @@ func (c *Client) read() {
 		}
 	}()
 
-	defer func() {
-		fmt.Println("读取客户端数据 关闭send", c)
-		close(c.Send)
-	}()
-
 	for {
 		_, message, err := c.Socket.ReadMessage()
 		if err != nil {

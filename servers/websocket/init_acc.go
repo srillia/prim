@@ -116,7 +116,7 @@ func clearExistsClient(sysAccount string, appPlatform string, userId string) {
 	for _, server := range servers {
 		if initialize.IsLocal(server) {
 			client := clientManager.GetUserClient(sysAccount, appPlatform, userId)
-			ClearClient(client)
+			ClearClient(client, &models.Acc{})
 		} else {
 
 			grpcclient.ClearExistsClient(server, sysAccount, appPlatform, userId)

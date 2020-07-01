@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"log"
 	"time"
 )
 
@@ -51,31 +49,8 @@ func GetContext() context.Context {
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	return ctx
 }
-
-func InsertOneData(coll *mongo.Collection, m bson.M) (interface{}, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	res, err := coll.InsertOne(ctx, m)
-	id := res.InsertedID
-	return id, err
-}
-
-func FindOne(coll *mongo.Collection, m interface{}, info interface{}) (interface{}, error) {
-	filter := m
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	err := coll.FindOne(ctx, filter).Decode(&info)
-	return info, err
-}
-
-func FindOneData(coll *mongo.Collection, m bson.M, info interface{}) interface{} {
-	filter := m
+func FindOne(coll *mongo.Collection, filter interface{}, info interface{}) error {
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	err := coll.FindOne(ctx, filter).Decode(info)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return info
-}
-
-func GetClient() (c *mongo.Client) {
-	return client
+	return err
 }

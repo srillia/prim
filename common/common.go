@@ -2,6 +2,7 @@ package common
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"errors"
 	"fmt"
 	uuid "github.com/satori/go.uuid"
@@ -11,10 +12,6 @@ import (
 	"strings"
 	"time"
 )
-
-func GenerateTempKey(account string, userId string) string {
-	return EncryptByMd5(account + "：" + userId)
-}
 
 func GenerateAuthCode(account string) string {
 	uuid := uuid.NewV4().String()
@@ -104,4 +101,9 @@ func GetFuncName() string {
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
 	return f.Name()
+}
+
+func ConvertType(data interface{}, ret interface{}) {
+	msgData, _ := json.Marshal(data)
+	json.Unmarshal(msgData, ret)
 }

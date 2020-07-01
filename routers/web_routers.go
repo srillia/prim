@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"prim/controllers/home"
+	"prim/controllers/msg"
 	"prim/controllers/sysclient"
 	"prim/controllers/systems"
 	"prim/controllers/user"
@@ -37,6 +38,12 @@ func InitWebRouters() {
 		//userRouter.POST("/sendMessage", user.SendMessage)
 		//userRouter.POST("/sendMessageAll", user.SendMessageAll)
 		//userRouter.GET("/sendMessageTest", user.SendMessageTest)
+	}
+
+	// 用户组
+	msgRouter := router.Group("/msg")
+	{
+		msgRouter.POST("/sendMsg", msg.SendMsg)
 	}
 
 	// 用户组

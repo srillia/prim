@@ -15,6 +15,7 @@ import (
 	"net"
 	"prim/common"
 	"prim/initialize"
+	"prim/models"
 	"prim/protobuf"
 	"prim/servers/websocket"
 )
@@ -53,7 +54,7 @@ func (s *server) ClearExistsClient(c context.Context, req *protobuf.ClearClientR
 
 	//清除用户在该平台的连接
 	client := websocket.GetUserClient(req.GetSysAccount(), req.GetAppPlatform(), req.GetUserId())
-	websocket.ClearClient(client)
+	websocket.ClearClient(client, &models.Acc{})
 
 	rsp = &protobuf.ClearClientRsp{}
 	rsp.RspCode = common.OK

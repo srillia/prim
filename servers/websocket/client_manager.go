@@ -10,6 +10,7 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"prim/lib/cache"
 	"prim/models"
 	"sync"
@@ -188,11 +189,11 @@ func (manager *ClientManager) DelUser(client *Client) (result bool) {
 	return
 }
 
-func ClearClient(client *Client) {
+func ClearClient(client *Client, acc *models.Acc) {
 	if client != nil {
+		fmt.Println("开始清理client", client)
 		//先发送一条退出的信息
 		if client != nil {
-			acc := models.Acc{}
 			//todo 添加为什么退出信息
 			retByte, err := json.Marshal(acc.ExitAcc(nil))
 			if err != nil {
@@ -200,7 +201,7 @@ func ClearClient(client *Client) {
 
 				return
 			}
-			client.SendMsg(retByte)
+			client.Socket.WriteMessage(websocket.TextMessage, retByte)
 		}
 		//清除client
 		client.Close()

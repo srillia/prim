@@ -167,3 +167,22 @@ func GetFuncName() string {
 	f := runtime.FuncForPC(pc[0])
 	return f.Name()
 }
+
+type T int
+
+func IsChanClosed(ch <-chan T) bool {
+	select {
+	case <-ch:
+		return true
+	default:
+	}
+
+	return false
+}
+
+func TestCloseChan(t *testing.T) {
+	c := make(chan T)
+	fmt.Println(IsChanClosed(c)) // false
+	close(c)
+	fmt.Println(IsChanClosed(c)) // true
+}
