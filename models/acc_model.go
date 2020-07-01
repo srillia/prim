@@ -16,6 +16,11 @@ func (acc *Acc) OkAcc(msg interface{}) *Acc {
 	return &Acc{acc.Seq, "ok", msg}
 }
 
+func (acc *Acc) ExitAcc(msg interface{}) *Acc {
+	//需要根据acc获取seq
+	return &Acc{acc.Seq, "exit", msg}
+}
+
 func (acc *Acc) AckAcc(msg interface{}) *Acc {
 	//需要根据acc获取seq
 	return &Acc{acc.Seq, "ack", msg}

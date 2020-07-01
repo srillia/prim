@@ -9,6 +9,10 @@ type Ok struct {
 	Result string `json:"result,omitempty"`
 }
 
+type Exit struct {
+	Result string `json:"result,omitempty"`
+}
+
 // 心跳请求数据
 type HeartBeat struct {
 	Result string `json:"result,omitempty"`

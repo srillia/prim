@@ -22,7 +22,7 @@ import (
 // ping
 func ExitController(client *Client, acc *models.Acc) *models.Acc {
 	ClearClient(client)
-	return acc.OkAcc(nil)
+	return acc.ExitAcc(nil)
 }
 
 // ping

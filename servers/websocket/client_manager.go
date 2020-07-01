@@ -8,8 +8,10 @@
 package websocket
 
 import (
+	"encoding/json"
 	"fmt"
 	"prim/lib/cache"
+	"prim/models"
 	"sync"
 	"time"
 )
@@ -188,6 +190,19 @@ func (manager *ClientManager) DelUser(client *Client) (result bool) {
 
 func ClearClient(client *Client) {
 	if client != nil {
+		//先发送一条退出的信息
+		if client != nil {
+			acc := models.Acc{}
+			//todo 添加为什么退出信息
+			retByte, err := json.Marshal(acc.ExitAcc(nil))
+			if err != nil {
+				fmt.Println("处理数据,序列化json", err)
+
+				return
+			}
+			client.SendMsg(retByte)
+		}
+		//清除client
 		client.Close()
 		GetClientManager().DelUser(client)
 		GetClientManager().DelClient(client)

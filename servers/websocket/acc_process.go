@@ -89,7 +89,10 @@ func ProcessData(client *Client, message []byte) {
 		return
 	}
 
-	client.SendMsg(retByte)
+	//如何action是exit说明client已经退出，连接已经断开
+	if ret.Action != "exit" {
+		client.SendMsg(retByte)
+	}
 
 	fmt.Println("acc_response send", client.Addr, client.AppPlatform, client.UserId, "action", ret.Action)
 
