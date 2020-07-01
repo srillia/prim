@@ -16,6 +16,7 @@ import (
 	"prim/lib/cache"
 	"prim/lib/redislib"
 	"prim/models"
+	"prim/servers/grpcclient"
 	"time"
 )
 
@@ -61,11 +62,13 @@ func StartWebSocket() {
 func wsPage(w http.ResponseWriter, req *http.Request) {
 	token := req.URL.Query().Get("token")
 	pass, sysAccount, appPlatform, userId := redislib.PassCheckToken(token)
-	//todo,先检测，clientManager里的client是否存在，存在删除，再建立连接
 	if pass == false {
 		//直接return,没有权限连接
 		return
 	}
+	//todo,先检测，clientManager里的client是否存在，存在删除，再建立连接
+
+	clearExistsClient(sysAccount, appPlatform, userId)
 
 	if !InAppPlatforms(appPlatform) {
 		fmt.Println("用户登录 不支持的平台", appPlatform)
@@ -101,6 +104,27 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 
 }
 
+func clearExistsClient(sysAccount string, appPlatform string, userId string) {
+	currentTime := uint64(time.Now().Unix())
+	servers, err := cache.GetServerAll(currentTime)
+	if err != nil {
+		fmt.Println("所有服务器正常", err)
+
+		return
+	}
+
+	for _, server := range servers {
+		if initialize.IsLocal(server) {
+			client := clientManager.GetUserClient(sysAccount, appPlatform, userId)
+			ClearClient(client)
+		} else {
+
+			grpcclient.ClearExistsClient(server, sysAccount, appPlatform, userId)
+		}
+	}
+
+}
+
 func saveUserAndClient(client *Client, currentTime uint64) {
 
 	// 存储用户登录数据
@@ -114,7 +138,7 @@ func saveUserAndClient(client *Client, currentTime uint64) {
 	// 连接存在，在添加,在缓存添加用户client信息
 	if clientManager.InClient(client) {
 		userKey := GetUserKey(client.SysAccount, client.AppPlatform, client.UserId)
-		clientManager.AddUsers(userKey, client)
+		clientManager.AddUser(userKey, client)
 	}
 
 }

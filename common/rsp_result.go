@@ -13,7 +13,7 @@ type JsonResult struct {
 	Data interface{} `json:"data"`
 }
 
-func Response(code uint32, message string, data interface{}) JsonResult {
+func Result(code uint32, message string, data interface{}) JsonResult {
 
 	message = GetErrorMessage(code, message)
 	jsonMap := grantMap(code, message, data)

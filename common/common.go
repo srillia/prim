@@ -6,6 +6,7 @@ import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -95,4 +96,12 @@ func CopyProperties(src, dst interface{}) (err error) {
 
 	return nil
 
+}
+
+//获取被调用方的方法名称
+func GetFuncName() string {
+	pc := make([]uintptr, 1)
+	runtime.Callers(2, pc)
+	f := runtime.FuncForPC(pc[0])
+	return f.Name()
 }

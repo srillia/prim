@@ -54,6 +54,8 @@ func PassCheckToken(token string) (isPass bool, sysAccount string, appPlatform s
 	arr := common.ParseToken(tokenValue)
 	//err==有nil说明有值
 	if err == nil {
+
+		//todo grpc访问所有的服务器，删除已经连接的请求
 		return true, arr[0], arr[1], arr[2]
 	}
 	return false, "", "", ""

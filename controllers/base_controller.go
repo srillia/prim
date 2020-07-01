@@ -19,7 +19,7 @@ type BaseController struct {
 
 // 获取全部请求解析到map
 func Response(c *gin.Context, code uint32, msg string, data map[string]interface{}) {
-	message := common.Response(code, msg, data)
+	message := common.Result(code, msg, data)
 
 	// 允许跨域
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")

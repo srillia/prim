@@ -21,10 +21,8 @@ import (
 
 // ping
 func ExitController(client *Client, acc *models.Acc) *models.Acc {
-
-	//todo 清连接缓存
-
-	return nil
+	ClearClient(client)
+	return acc.OkAcc(nil)
 }
 
 // ping

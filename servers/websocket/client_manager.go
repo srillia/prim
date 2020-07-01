@@ -44,7 +44,7 @@ func GetUserKey(account string, appPlatform string, userId string) (key string) 
 	return
 }
 
-// 获取用户key
+// 获取在所有平台的用户的key
 func GetUserKeysInAllPlatform(account string, userId string) (keys []string) {
 	for _, platform := range GetAppPlatforms() {
 		keys = append(keys, fmt.Sprintf("%s_%s_%s", account, platform, userId))
@@ -52,7 +52,7 @@ func GetUserKeysInAllPlatform(account string, userId string) (keys []string) {
 	return
 }
 
-// 获取用户key
+// 获取该用在在所有平台不包含当前平台的key
 func GetUserKeysExcludeThePlatform(account string, appPlatform string, userId string) (keys []string) {
 	for _, platform := range GetAppPlatforms() {
 		if platform != appPlatform {
@@ -62,7 +62,7 @@ func GetUserKeysExcludeThePlatform(account string, appPlatform string, userId st
 	return
 }
 
-// 获取用户key
+// 获取所有需要发送的用户的key
 func GetUserKeysNeedMsging(account string, appPlatform string, senderId string, receiverIds []string) (keys []string) {
 	//先获取我其它平台的用户，这些用户要需要接受信息
 	keys = GetUserKeysExcludeThePlatform(account, appPlatform, senderId)
@@ -127,7 +127,7 @@ func (manager *ClientManager) GetClientsLen() (clientsLen int) {
 }
 
 // 添加客户端
-func (manager *ClientManager) AddClients(client *Client) {
+func (manager *ClientManager) AddClient(client *Client) {
 	manager.ClientsLock.Lock()
 	defer manager.ClientsLock.Unlock()
 
@@ -135,7 +135,7 @@ func (manager *ClientManager) AddClients(client *Client) {
 }
 
 // 删除客户端
-func (manager *ClientManager) DelClients(client *Client) {
+func (manager *ClientManager) DelClient(client *Client) {
 	manager.ClientsLock.Lock()
 	defer manager.ClientsLock.Unlock()
 
@@ -166,7 +166,7 @@ func (manager *ClientManager) GetUsersLen() (userLen int) {
 }
 
 // 添加用户
-func (manager *ClientManager) AddUsers(key string, client *Client) {
+func (manager *ClientManager) AddUser(key string, client *Client) {
 	manager.UserLock.Lock()
 	defer manager.UserLock.Unlock()
 
@@ -174,22 +174,25 @@ func (manager *ClientManager) AddUsers(key string, client *Client) {
 }
 
 // 删除用户
-func (manager *ClientManager) DelUsers(client *Client) (result bool) {
+func (manager *ClientManager) DelUser(client *Client) (result bool) {
 	manager.UserLock.Lock()
 	defer manager.UserLock.Unlock()
 
 	key := GetUserKey(client.SysAccount, client.AppPlatform, client.UserId)
-	if value, ok := manager.Users[key]; ok {
-		// 判断是否为相同的用户
-		if value.Addr != client.Addr {
-
-			return
-		}
+	if _, ok := manager.Users[key]; ok {
 		delete(manager.Users, key)
 		result = true
 	}
-
 	return
+}
+
+func ClearClient(client *Client) {
+	if client != nil {
+		client.Close()
+		GetClientManager().DelUser(client)
+		GetClientManager().DelClient(client)
+	}
+
 }
 
 // 获取用户的key
@@ -249,7 +252,7 @@ func (manager *ClientManager) sendAll(message []byte, ignore *Client) {
 
 // 用户建立连接事件
 func (manager *ClientManager) EventRegister(client *Client) {
-	manager.AddClients(client)
+	manager.AddClient(client)
 
 	fmt.Println("EventRegister 用户建立连接", client.Addr)
 
@@ -263,7 +266,7 @@ func (manager *ClientManager) EventRegister(client *Client) {
 //	// 连接存在，在添加
 //	if manager.InClient(client) {
 //		userKey := login.GetKey()
-//		manager.AddUsers(userKey, login.Client)
+//		manager.AddUser(userKey, login.Client)
 //	}
 //
 //	fmt.Println("EventLogin 用户登录", client.Addr, login.AppPlatform, login.UserId)
@@ -274,10 +277,10 @@ func (manager *ClientManager) EventRegister(client *Client) {
 
 // 用户断开连接
 func (manager *ClientManager) EventUnregister(client *Client) {
-	manager.DelClients(client)
+	manager.DelClient(client)
 
 	// 删除用户连接
-	deleteResult := manager.DelUsers(client)
+	deleteResult := manager.DelUser(client)
 	if deleteResult == false {
 		// 不是当前连接的客户端
 

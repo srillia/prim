@@ -10,6 +10,7 @@ import (
 	"prim/initialize"
 	"prim/lib/mongolib"
 	"prim/models"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -154,4 +155,15 @@ func TestConvertType(t *testing.T) {
 func convertType(data interface{}, ret interface{}) {
 	msgData, _ := json.Marshal(data)
 	json.Unmarshal(msgData, ret)
+}
+
+func TestRunFuncName(t *testing.T) {
+	fmt.Println(GetFuncName())
+}
+
+func GetFuncName() string {
+	pc := make([]uintptr, 1)
+	runtime.Callers(2, pc)
+	f := runtime.FuncForPC(pc[0])
+	return f.Name()
 }

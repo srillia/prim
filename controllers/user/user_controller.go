@@ -82,7 +82,7 @@ func Online(c *gin.Context) {
 //
 //	if cache.SeqDuplicates(msgId) {
 //		fmt.Println("给用户发送消息 重复提交:", msgId)
-//		controllers.Response(c, common.OK, "", data)
+//		controllers.Result(c, common.OK, "", data)
 //
 //		return
 //	}
@@ -94,7 +94,7 @@ func Online(c *gin.Context) {
 //
 //	data["sendResults"] = sendResults
 //
-//	controllers.Response(c, common.OK, "", data)
+//	controllers.Result(c, common.OK, "", data)
 //}
 //
 //// 给全员发送消息
@@ -112,7 +112,7 @@ func Online(c *gin.Context) {
 //	data := make(map[string]interface{})
 //	if cache.SeqDuplicates(msgId) {
 //		fmt.Println("给用户发送消息 重复提交:", msgId)
-//		controllers.Response(c, common.OK, "", data)
+//		controllers.Result(c, common.OK, "", data)
 //
 //		return
 //	}
@@ -125,7 +125,7 @@ func Online(c *gin.Context) {
 //
 //	data["sendResults"] = sendResults
 //
-//	controllers.Response(c, common.OK, "", data)
+//	controllers.Result(c, common.OK, "", data)
 //
 //}
 //
@@ -138,5 +138,5 @@ func Online(c *gin.Context) {
 //		fmt.Println("获取的值:", val)
 //	}
 //
-//	controllers.Response(c, common.OK, val, nil)
+//	controllers.Result(c, common.OK, val, nil)
 //}

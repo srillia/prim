@@ -144,19 +144,11 @@ func (c *Client) SendMsg(msg []byte) {
 	c.Send <- msg
 }
 
-// 读取客户端数据
-func (c *Client) close() {
+// 关闭conn客户端
+func (c *Client) Close() {
 	close(c.Send)
+	c.Socket.Close()
 }
-
-// todo，此方法作废
-//func (c *Client) Login(appPlatform uint32, userId string, loginTime uint64) {
-//	c.AppPlatform = appPlatform
-//	c.UserId = userId
-//	c.LoginTime = loginTime
-//	// 登录成功=心跳一次
-//	c.Heartbeat(loginTime)
-//}
 
 // 用户心跳
 func (c *Client) Heartbeat(currentTime uint64) {
