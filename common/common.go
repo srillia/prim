@@ -26,9 +26,9 @@ func EncryptByMd5(password string) string {
 	return md5str1
 }
 
-func GenerateTokenFieldAndValue(account string, appPlatform string, userId string) (tokenField string, tokenValue string) {
-	tokenValue = fmt.Sprintf("%s_%s_%s", account, appPlatform, userId)
-	tokenField = EncryptByMd5(tokenValue + strconv.FormatInt(time.Now().UnixNano(), 10))
+func GenerateTokenKey(account string, appPlatform string, userId string) (key string) {
+	tokenValue := fmt.Sprintf("%s_%s_%s", account, appPlatform, userId)
+	key = EncryptByMd5(tokenValue + strconv.FormatInt(time.Now().UnixNano(), 10))
 	return
 }
 

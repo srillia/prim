@@ -19,7 +19,7 @@ func SendMsg(c *gin.Context) {
 	data := make(map[string]interface{})
 	token := c.Query("token")
 
-	pass, sysAccount, appPlatform, userId := redislib.PassCheckToken(token)
+	pass, sysAccount, appPlatform, userId, avatar, nickname := redislib.PassCheckToken(token)
 	if pass == false {
 		//直接return,没有权限连接
 		controllers.Response(c, common.Unauthorized, "", data)
@@ -41,7 +41,11 @@ func SendMsg(c *gin.Context) {
 	} else {
 		msg.Time = time.Now().UnixNano()
 	}
-	msg.SenderId = c.PostForm("senderId")
+	//设置senderInfo
+	msg.SenderInfo.UserId = userId
+	msg.SenderInfo.Avatar = avatar
+	msg.SenderInfo.Nickname = nickname
+
 	msg.RoomId = c.PostForm("roomId")
 	msg.MsgContType = c.PostForm("msgContType")
 	msg.MsgType = c.PostForm("msgType")
@@ -50,9 +54,9 @@ func SendMsg(c *gin.Context) {
 	//通过http发送信息，没有acc唯一id
 	acc.Seq = ""
 	acc.Action = "msg"
-	acc.Msg = &msg
+	acc.Msg = msg
 
-	websocket.SaveMessageInMongo(client, acc)
+	websocket.SaveMessageInMongo(client, msg)
 	fmt.Printf("给用户发送消息:%v", msg)
 	websocket.SendMessageToReceivers(client, acc, []string{msg.ReceiverId})
 

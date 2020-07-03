@@ -61,7 +61,7 @@ func StartWebSocket() {
 
 func wsPage(w http.ResponseWriter, req *http.Request) {
 	token := req.URL.Query().Get("token")
-	pass, sysAccount, appPlatform, userId := redislib.PassCheckToken(token)
+	pass, sysAccount, appPlatform, userId, avatar, nickname := redislib.PassCheckToken(token)
 	if pass == false {
 		//直接return,没有权限连接
 		return
@@ -97,7 +97,7 @@ func wsPage(w http.ResponseWriter, req *http.Request) {
 	clientManager.Register <- client
 
 	//在redis保存
-	saveUserAndClient(client, currentTime)
+	saveUserAndClient(client, avatar, nickname, currentTime)
 
 	go client.read()
 	go client.write()
@@ -125,10 +125,10 @@ func clearExistsClient(sysAccount string, appPlatform string, userId string) {
 
 }
 
-func saveUserAndClient(client *Client, currentTime uint64) {
+func saveUserAndClient(client *Client, avatar string, nickname string, currentTime uint64) {
 
 	// 存储用户登录数据
-	userOnline := models.UserLogin(initialize.ServerIp, initialize.AccPort, client.AppPlatform, client.SysAccount, client.UserId, client.Addr, currentTime)
+	userOnline := models.NewUser(initialize.ServerIp, initialize.AccPort, client.AppPlatform, client.SysAccount, client.UserId, avatar, nickname, client.Addr, currentTime)
 	err := cache.SetUserOnlineInfo(client.GetKey(), userOnline)
 	if err != nil {
 		fmt.Printf("保存登录用户信息成功:%v", userOnline)

@@ -17,12 +17,14 @@ const (
 )
 
 // 用户在线状态
-type UserOnline struct {
+type User struct {
 	AccIp         string `json:"accIp"`         // acc Ip
 	AccPort       string `json:"accPort"`       // acc 端口
 	AppPlatform   string `json:"appPlatform"`   // appPlatform
 	SysAccount    string `json:"sysAccount"`    // appPlatform
 	UserId        string `json:"userId"`        // 用户Id
+	Avatar        string `json:"avatar"`        // avatar 头像
+	Nickname      string `json:"nickname"`      // nickname 昵称
 	ClientIp      string `json:"clientIp"`      // 客户端Ip
 	ClientPort    string `json:"clientPort"`    // 客户端端口
 	LoginTime     uint64 `json:"loginTime"`     // 用户上次登录时间
@@ -36,14 +38,16 @@ type UserOnline struct {
 /**********************  数据处理  *********************************/
 
 // 用户登录
-func UserLogin(accIp, accPort string, appPlatform string, sysAccount string, userId string, addr string, loginTime uint64) (userOnline *UserOnline) {
+func NewUser(accIp, accPort string, appPlatform string, sysAccount string, userId string, avatar string, nickname string, addr string, loginTime uint64) (userOnline *User) {
 
-	userOnline = &UserOnline{
+	userOnline = &User{
 		AccIp:         accIp,
 		AccPort:       accPort,
 		AppPlatform:   appPlatform,
 		SysAccount:    sysAccount,
 		UserId:        userId,
+		Avatar:        avatar,
+		Nickname:      nickname,
 		ClientIp:      addr,
 		LoginTime:     loginTime,
 		HeartbeatTime: loginTime,
@@ -54,7 +58,7 @@ func UserLogin(accIp, accPort string, appPlatform string, sysAccount string, use
 }
 
 // 用户心跳
-func (u *UserOnline) Heartbeat(currentTime uint64) {
+func (u *User) Heartbeat(currentTime uint64) {
 
 	u.HeartbeatTime = currentTime
 	u.IsLogoff = false
@@ -63,7 +67,7 @@ func (u *UserOnline) Heartbeat(currentTime uint64) {
 }
 
 // 用户退出登录
-func (u *UserOnline) LogOut() {
+func (u *User) LogOut() {
 
 	currentTime := uint64(time.Now().Unix())
 	u.LogOutTime = currentTime
@@ -75,7 +79,7 @@ func (u *UserOnline) LogOut() {
 /**********************  数据操作  *********************************/
 
 // 用户是否在线
-func (u *UserOnline) IsOnline() (online bool) {
+func (u *User) IsOnline() (online bool) {
 	if u.IsLogoff {
 
 		return
@@ -99,7 +103,7 @@ func (u *UserOnline) IsOnline() (online bool) {
 }
 
 // 用户是否在本台机器上
-func (u *UserOnline) UserIsLocal(localIp, localPort string) (result bool) {
+func (u *User) UserIsLocal(localIp, localPort string) (result bool) {
 
 	if u.AccIp == localIp && u.AccPort == localPort {
 		result = true

@@ -28,8 +28,8 @@ func PingController(client *Client, acc *models.Acc) *models.Acc {
 
 // 给用户发送消息
 func MsgController(client *Client, acc *models.Acc) *models.Acc {
-
-	msg := SaveMessageInMongo(client, acc)
+	msg := disposeMsgAcc(client, acc)
+	SaveMessageInMongo(client, msg)
 	fmt.Printf("给用户发送消息:%v", msg)
 	SendMessageToReceivers(client, acc, []string{msg.ReceiverId})
 	return acc.AckAcc(nil)

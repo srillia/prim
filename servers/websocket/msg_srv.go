@@ -62,20 +62,28 @@ func SendMessagesByLocal(client *Client, acc *models.Acc, receiverIds []string) 
 	}
 }
 
-func SaveMessageInMongo(client *Client, acc *models.Acc) (msg *models.Msg) {
-	msg = disposeMsgAcc(client, acc)
+func SaveMessageInMongo(client *Client, msg *models.Msg) {
 	checkRoomInfoMongo(client, msg)
 	addMessageInMongo(client, msg)
-	return
 }
 
-func disposeMsgAcc(client *Client, acc *models.Acc) *models.Msg {
-	msg := &models.Msg{}
+func disposeMsgAcc(client *Client, acc *models.Acc) (msg *models.Msg) {
+	msg = &models.Msg{}
 	common.ConvertType(acc.Msg, msg)
-	msg.SenderId = client.UserId
 	msg.DateTime = common.TimestampToDateString(msg.Time)
+	userOncline, _ := cache.GetUserOnlineInfo(client.GetKey())
+	//判断空值，如果，用户
+	if msg.SenderInfo.UserId == "" {
+		msg.SenderInfo.UserId = userOncline.UserId
+	}
+	if msg.SenderInfo.Avatar == "" {
+		msg.SenderInfo.Avatar = userOncline.Avatar
+	}
+	if msg.SenderInfo.Nickname == "" {
+		msg.SenderInfo.Nickname = userOncline.Nickname
+	}
 	acc.Msg = msg
-	return msg
+	return
 }
 
 func addMessageInMongo(client *Client, msg *models.Msg) {

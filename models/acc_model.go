@@ -9,6 +9,7 @@ type Acc struct {
 	Action string `json:"action"` // 请求命令字
 	//信息的数据包
 	Msg interface{} `json:"msg,omitempty"` // 消息体
+	//信息的数据包
 }
 
 func (acc *Acc) OkAcc(msg interface{}) *Acc {

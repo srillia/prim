@@ -78,16 +78,18 @@ func saveSysClient(phoneNum string, account string, password string) error {
 
 //获取临时用户key，临时用户key，是用来，标记第三方系统的用户具有连接prim的权限的身份
 func GetToken(c *gin.Context) {
+	authCode := c.Query("authCode")
 	sysAccount := c.Query("sysAccount")
 	appPlatform := c.Query("appPlatform")
-	authCode := c.Query("authCode")
 	userId := c.Query("userId")
+	avatar := c.Query("avatar")
+	nickname := c.Query("nickname")
 	data := make(map[string]interface{})
 	if checkAuthCode(sysAccount, authCode) {
 
-		tokenField, tokenValue := common.GenerateTokenFieldAndValue(sysAccount, appPlatform, userId)
-		redislib.SaveToken(tokenField, tokenValue)
-		data["token"] = tokenField
+		tokeyKey := common.GenerateTokenKey(sysAccount, appPlatform, userId)
+		redislib.SaveToken(tokeyKey, sysAccount, appPlatform, userId, avatar, nickname)
+		data["token"] = tokeyKey
 		controllers.Response(c, common.OK, "", data)
 	} else {
 		controllers.Response(c, common.Unauthorized, "", data)

@@ -23,11 +23,10 @@ const (
 /*********************  查询用户是否在线  ************************/
 func getUserOnlineKey(userKey string) (key string) {
 	key = fmt.Sprintf("%s%s", userOnlinePrefix, userKey)
-
 	return
 }
 
-func GetUserOnlineInfo(userKey string) (userOnline *models.UserOnline, err error) {
+func GetUserOnlineInfo(userKey string) (userOnline *models.User, err error) {
 	redisClient := redislib.GetClient()
 
 	key := getUserOnlineKey(userKey)
@@ -45,7 +44,7 @@ func GetUserOnlineInfo(userKey string) (userOnline *models.UserOnline, err error
 		return
 	}
 
-	userOnline = &models.UserOnline{}
+	userOnline = &models.User{}
 	err = json.Unmarshal(data, userOnline)
 	if err != nil {
 		fmt.Println("获取用户在线数据 json Unmarshal", userKey, err)
@@ -60,7 +59,7 @@ func GetUserOnlineInfo(userKey string) (userOnline *models.UserOnline, err error
 
 //TODO 往redis中存用户的数据
 //设置用户在线数据
-func SetUserOnlineInfo(userKey string, userOnline *models.UserOnline) (err error) {
+func SetUserOnlineInfo(userKey string, userOnline *models.User) (err error) {
 
 	redisClient := redislib.GetClient()
 	key := getUserOnlineKey(userKey)
@@ -72,12 +71,11 @@ func SetUserOnlineInfo(userKey string, userOnline *models.UserOnline) (err error
 		return
 	}
 
-	_, err = redisClient.Do("setEx", key, userOnlineCacheTime, string(valueByte)).Result()
+	_, err = redisClient.Set(key, string(valueByte), -1).Result()
 	if err != nil {
 		fmt.Println("设置用户在线数据 ", key, err)
 
 		return
 	}
-
 	return
 }

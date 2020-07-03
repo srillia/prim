@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
-	"prim/common"
 )
 
 var (
@@ -39,24 +38,36 @@ func GetClient() (c *redis.Client) {
 	return client
 }
 
-func SaveToken(tokenField string, tokenValue string) {
-	client.Do("set", addPrefix(tokenField), tokenValue)
-	client.Do("expire", addPrefix(tokenField), 12*3600)
+func SaveToken(tokenField string, sysAccount string, appPlatform string, userId string, avatar string, nickname string) {
+	key := addPrefix(tokenField)
+
+	client.Do("hSet", key, "sysAccount", sysAccount).Int()
+	client.Do("hSet", key, "appPlatform", appPlatform).Int()
+	client.Do("hSet", key, "userId", userId).Int()
+	client.Do("hSet", key, "avatar", avatar).Int()
+	client.Do("hSet", key, "nickname", nickname).Int()
+
+	client.Do("expire", key, 12*3600)
 }
 
 func addPrefix(tokenField string) (token string) {
 	return primTokeyKey + ":" + tokenField
 }
 
-func PassCheckToken(token string) (isPass bool, sysAccount string, appPlatform string, userId string) {
-	//处理token
-	tokenValue, err := client.Do("get", addPrefix(token)).String()
-	arr := common.ParseToken(tokenValue)
-	//err==有nil说明有值
-	if err == nil {
+func PassCheckToken(token string) (isPass bool, sysAccount string, appPlatform string, userId string, avatar string, nickname string) {
+	key := addPrefix(token)
 
-		//todo grpc访问所有的服务器，删除已经连接的请求
-		return true, arr[0], arr[1], arr[2]
+	_, err := client.Exists(key).Result()
+	//认证通过
+	if err == nil {
+		isPass = true
+		sysAccount = client.HGet(key, "sysAccount").Val()
+		appPlatform = client.HGet(key, "appPlatform").Val()
+		userId = client.HGet(key, "userId").Val()
+		avatar = client.HGet(key, "avatar").Val()
+		nickname = client.HGet(key, "nickname").Val()
+	} else {
+		isPass = false
 	}
-	return false, "", "", ""
+	return
 }
