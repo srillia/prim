@@ -17,6 +17,7 @@ import (
 	"prim/lib/redislib"
 	"prim/models"
 	"prim/servers/grpcclient"
+	"strings"
 	"time"
 )
 
@@ -34,11 +35,9 @@ func GetClientManager() *ClientManager {
 }
 
 func InAppPlatforms(appPlatform string) (inAppPlatform bool) {
-
 	for _, value := range appPlatforms {
-		if value == appPlatform {
+		if value == strings.ToLower(appPlatform) {
 			inAppPlatform = true
-
 			return
 		}
 	}

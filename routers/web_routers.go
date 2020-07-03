@@ -40,7 +40,7 @@ func InitWebRouters() {
 		//userRouter.GET("/sendMessageTest", user.SendMessageTest)
 	}
 
-	// 用户组
+	// msg
 	msgRouter := router.Group("/msg")
 	{
 		msgRouter.POST("/sendMsg", msg.SendMsg)
