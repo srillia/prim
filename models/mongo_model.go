@@ -23,7 +23,7 @@ type PrimMessage struct {
 	SysAccount  string             `bson:"sysAccount,omitempty"`
 	Time        int64              `json:"time,omitempty"`
 	DateTime    string             `json:"dateTime,omitempty"`
-	SenderId    string             `bson:"senderId,omitempty"`
+	SenderInfo  SenderInfo         `bson:"senderInfo,omitempty"`
 	ReceiverId  string             `bson:"receiverId,omitempty"`
 	Message     string             `bson:"message,omitempty"`
 	RoomId      string             `bson:"roomId,omitempty"`
