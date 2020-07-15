@@ -54,3 +54,11 @@ func FindOne(coll *mongo.Collection, filter interface{}, info interface{}) error
 	err := coll.FindOne(ctx, filter).Decode(info)
 	return err
 }
+
+//todo 获取所有消息，看看是否需要做成分页
+//@author Fran
+func FindAll(coll *mongo.Collection, filter interface{}) (*mongo.Cursor, error) {
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	find, err := coll.Find(ctx, filter)
+	return find, err
+}

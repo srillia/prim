@@ -8,10 +8,12 @@
 package websocket
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	"prim/common"
 	"prim/initialize"
 	"prim/lib/cache"
@@ -120,5 +122,32 @@ func addRoomInfoWhenNoRoomIdInMsg(client *Client, msgData *models.Msg) {
 		room := models.PrimRoom{UserList: userList}
 		id, _ := mongolib.InsertOne(mongolib.GetConn("prim_room"), room)
 		msgData.RoomId = id.(primitive.ObjectID).Hex()
+	}
+}
+
+//获取消息的方法 @author Fran
+func GetMsgFromMongo(senderId string, receiverId string) ([]*models.Msg, error) {
+	var res []*models.Msg
+	userList := [2]string{senderId, receiverId}
+	primRoom := &models.PrimRoom{}
+	err := mongolib.FindOne(mongolib.GetConn("prim_room"), bson.D{{"userList", bson.D{{"$all", userList}}}}, primRoom)
+	if err == nil { //存在房间号，根据房间号获取消息
+		roomId := primRoom.Id.Hex()
+		cur, _ := mongolib.FindAll(mongolib.GetConn("prim_message"), bson.D{{"roomId", roomId}})
+		defer cur.Close(context.TODO())
+		if cur != nil {
+			for cur.Next(context.TODO()) {
+				var msg models.Msg
+				err := cur.Decode(&msg)
+				if err != nil {
+					log.Fatal(err)
+				}
+				res = append(res, &msg)
+			}
+		}
+		return res, nil
+	} else {
+		//不存在房间号
+		return nil, err
 	}
 }

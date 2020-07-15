@@ -44,6 +44,8 @@ func InitWebRouters() {
 	msgRouter := router.Group("/msg")
 	{
 		msgRouter.POST("/sendMsg", msg.SendMsg)
+		//获取消息的方法 @author Fran
+		msgRouter.GET("/getMsg", msg.GetMsg)
 	}
 
 	// 用户组

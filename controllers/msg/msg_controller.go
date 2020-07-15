@@ -62,3 +62,17 @@ func SendMsg(c *gin.Context) {
 
 	controllers.Response(c, common.OK, "", data)
 }
+
+//获取消息，根据发送者id与接收者id  @author Fran
+func GetMsg(c *gin.Context) {
+	data := make(map[string]interface{})
+	receiverId := c.Query("receiverId")
+	senderId := c.Query("senderId")
+	msgList, err := websocket.GetMsgFromMongo(senderId, receiverId)
+	if err != nil {
+		controllers.Response(c, common.OperationFailure, "", data)
+	} else {
+		data["msgList"] = msgList
+		controllers.Response(c, common.OK, "", data)
+	}
+}
