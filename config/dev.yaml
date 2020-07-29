@@ -3,19 +3,19 @@ app:
   httpPort: 8093
   webSocketPort: 8089
   rpcPort: 9001
-  httpUrl: 192.168.10.222:8093
-  webSocketUrl:  192.168.10.222:8089
+  httpUrl: 192.168.10.235:8093
+  webSocketUrl:  192.168.10.235:8089
 
 
 
 mongo:
-  addr: "192.168.10.226:27017"
+  addr: "192.168.10.235:27017"
   username: root
   password: 123
   db: admin
 
 redis:
-  addr: "192.168.10.44:6379"
+  addr: "192.168.10.235:6379"
   password: ""
   DB: 0
   poolSize: 30
