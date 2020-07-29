@@ -3,8 +3,8 @@ app:
   httpPort: 8093
   webSocketPort: 8089
   rpcPort: 9001
-  httpUrl: 192.168.10.235:8093
-  webSocketUrl:  192.168.10.235:8089
+  httpUrl: 192.168.10.231:8093
+  webSocketUrl:  192.168.10.231:8089
 
 
 
