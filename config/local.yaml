@@ -4,7 +4,7 @@ app:
   webSocketPort: 8089
   rpcPort: 9001
   httpUrl: localhost:8093
-  webSocketUrl:  192.168.10.4:8089
+  webSocketUrl:  localhost:8089
 
 
 
@@ -17,6 +17,6 @@ mongo:
 redis:
   addr: "192.168.10.235:6379"
   password: ""
-  DB: 1
+  DB: 0
   poolSize: 30
   minIdleConns: 30

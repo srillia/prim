@@ -13,7 +13,6 @@ import (
 	"prim/common"
 	"prim/controllers"
 	"prim/servers/websocket"
-	"strconv"
 )
 
 // 查看全部在线用户
@@ -50,11 +49,11 @@ func Online(c *gin.Context) {
 	sysAccount := c.Query("sysAccount")
 
 	fmt.Println("http_request 查看用户是否在线", userId, appPlatformStr)
-	appPlatform, _ := strconv.ParseInt(appPlatformStr, 10, 32)
+	//appPlatform, _ := strconv.ParseInt(appPlatformStr, 10, 32)
 
 	data := make(map[string]interface{})
 
-	online := websocket.CheckUserOnline(sysAccount, string(appPlatform), userId)
+	online := websocket.CheckUserOnline(sysAccount, string(appPlatformStr), userId)
 	data["userId"] = userId
 	data["online"] = online
 
