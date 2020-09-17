@@ -9,10 +9,19 @@ package helper
 
 import (
 	"net"
+	"os"
 )
 
 // 获取服务器Ip
-func GetServerIp() (ip string) {
+func GetServerIp() string {
+	var (
+		ip       string
+		hostname string
+	)
+	hostname = os.Getenv("PRIM_HOSTNAME")
+	if hostname != "" {
+		return hostname
+	}
 	addrs, err := net.InterfaceAddrs()
 
 	if err != nil {
@@ -27,6 +36,5 @@ func GetServerIp() (ip string) {
 			}
 		}
 	}
-
-	return
+	return ip
 }
