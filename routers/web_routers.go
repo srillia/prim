@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"prim/controllers/home"
 	"prim/controllers/msg"
 	"prim/controllers/sysclient"
 	"prim/controllers/systems"
@@ -25,7 +24,6 @@ var (
 
 func InitWebRouters() {
 	router = gin.Default()
-	router.LoadHTMLGlob("views/**/*")
 
 	//router.LoadHTMLFiles("views/**/*")
 
@@ -54,6 +52,10 @@ func InitWebRouters() {
 		sysClientRouter.POST("/createSysClient", sysClient.CreateSysClient)
 		sysClientRouter.GET("/getSysClient", sysClient.GetSysClient)
 		sysClientRouter.GET("/getToken", sysClient.GetToken)
+
+		//加上用户退出，使用退出websocket连接；
+		sysClientRouter.POST("/exit", sysClient.ExitClient)
+
 	}
 
 	// 系统
@@ -62,11 +64,11 @@ func InitWebRouters() {
 		systemRouter.GET("/state", systems.Status)
 	}
 
-	// home
+	/*// home
 	homeRouter := router.Group("/home")
 	{
 		homeRouter.GET("/index", home.Index)
-	}
+	}*/
 
 	// router.POST("/user/online", user.Online)
 }

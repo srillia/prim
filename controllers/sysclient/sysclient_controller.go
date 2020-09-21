@@ -10,6 +10,7 @@ import (
 	"prim/lib/mongolib"
 	"prim/lib/redislib"
 	"prim/models"
+	"prim/servers/websocket"
 )
 
 //todo 做系统用户的登录和授权
@@ -105,4 +106,25 @@ func checkAuthCode(account string, code string) bool {
 	} else {
 		return false
 	}
+}
+
+//退出连接
+func ExitClient(c *gin.Context) {
+	token := c.Query("token")
+	if token == "" {
+		controllers.Response(c, common.ParameterIllegal, "", nil)
+	}
+	pass, sysAccount, appPlatform, userId, _, _ := redislib.PassCheckToken(token)
+	if pass == false {
+		//直接return,没有权限连接
+		controllers.Response(c, common.Unauthorized, "", nil)
+		return
+	}
+	client := websocket.GetUserClient(sysAccount, appPlatform, userId)
+	acc := &models.Acc{}
+	acc.Seq = ""
+	acc.Action = "msg"
+	acc.Msg = nil
+	websocket.ClearClient(client, acc)
+	controllers.Response(c, common.OK, "", nil)
 }
